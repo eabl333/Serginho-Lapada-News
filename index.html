@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repórter Serginho Lapada – Notícias com atitude</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOPO: DATA/HORA + REDES SOCIAIS -->
+  <div class="topo-bar">
+    <div class="container topo-inner">
+      <span id="relogio">Carregando...</span>
+      <div class="topo-links">
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+        <a href="https://wa.me/5565961197971" target="_blank">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA PLANTÃO (exatamente como nas imagens) -->
+  <div class="plantao-bar">
+    <span class="plantao-label">PLANTÃO</span>
+    <div class="plantao-track-wrap">
+      <div class="plantao-track" id="plantaoTrack">
+        <span>🚨 Acompanhe a sessão da Câmara</span>
+        <span>🌡️ TEMPO: Frente fria chega à região nas próximas horas</span>
+        <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total no sentido bairro</span>
+        <span>⚽ ESPORTES: Time local goleia adversário e assume liderança</span>
+        <span>🚨 Operação policial desarticula quadrilha no Centro</span>
+        <!-- repetido para efeito infinito -->
+        <span>🚨 Acompanhe a sessão da Câmara</span>
+        <span>🌡️ TEMPO: Frente fria chega à região nas próximas horas</span>
+        <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total no sentido bairro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo-area">
+        <div class="logo-icon">📰</div>
+        <div>
+          <div class="logo-title">Repórter Serginho Lapada</div>
+          <div class="logo-slogan">NOTÍCIAS COM ATITUDE</div>
+        </div>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+      <nav class="main-nav" id="mainNav">
+        <a href="#">Home</a>
+        <a href="#">Últimas</a>
+        <a href="#">Polícia</a>
+        <a href="#">Política</a>
+        <a href="#">Cidades</a>
+        <a href="#">Esportes</a>
+        <a href="#">Entretenimento</a>
+        <a href="#">Vídeos</a>
+        <a href="#">Contato</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="container main-layout">
+
+    <!-- COLUNA CENTRAL -->
+    <div class="col-center">
+
+      <!-- DESTAQUE PRINCIPAL (conforme imagem da polícia) -->
+      <section class="destaque-section">
+        <div class="destaque-card fade-in">
+          <div class="destaque-img">
+            <div class="destaque-placeholder">
+              <span class="destaque-icon">🚔</span>
+            </div>
+            <span class="badge badge-urgente">🚨 URGENTE</span>
+          </div>
+          <div class="destaque-body">
+            <span class="cat-label cat-policia">Polícia</span>
+            <h1 class="destaque-title">Operação policial desarticula quadrilha no Centro e apreende grande quantidade de drogas</h1>
+            <p class="destaque-resumo">Ação conjunta entre Polícia Civil e Militar resultou em cinco prisões na quadrilha desta terça-feira.</p>
+            <div class="meta-row">
+              <span class="meta-autor">✍️ Serginho Lapada</span>
+              <span class="meta-tempo">🕐 há 35 min</span>
+              <a href="noticia-policia.html" class="btn-leia">Leia mais →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ÚLTIMAS NOTÍCIAS -->
+      <section class="secao">
+        <div class="secao-header">
+          <h2 class="secao-titulo">🗞️ ÚLTIMAS NOTÍCIAS</h2>
+          <a href="#" class="ver-todas">Ver todas →</a>
+        </div>
+        <a href="noticia-completa.html" style="text-decoration: none; color: inherit;">
+          <article class="card fade-in">
+            <div class="card-img-wrap">
+              <div class="card-img-ph"><span>👮</span></div>
+              <span class="badge badge-policia">Polícia</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-titulo">Operação policial desarticula quadrilha no Centro e apreende grande quantidade de drogas</h3>
+              <p class="card-resumo">Ação conjunta entre Polícia Civil e Militar resultou em cinco prisões...</p>
+              <div class="card-meta">
+                <span>✍️ Serginho Lapada</span>
+                <span>🕐 há 35 min</span>
+              </div>
+            </div>
+          </article>
+        </a>
+        <a href="noticia-obras.html" style="text-decoration: none; color: inherit;">
+          <article class="card fade-in">
+            <div class="card-img-wrap">
+              <div class="card-img-ph"><span>🏗️</span></div>
+              <span class="badge badge-cidades">Cidades</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-titulo">Prefeitura anuncia pacote de obras em 12 bairros para os próximos meses</h3>
+              <p class="card-resumo">Investimento ultrapassa R$ 80 milhões e prioriza pavimentação, iluminação e mobilidade.</p>
+              <div class="card-meta">
+                <span>✍️ Redação</span>
+                <span>🕐 há 2 h</span>
+              </div>
+            </div>
+          </article>
+        </a>
+        </div>
+      </section>
+
+      <!-- VÍDEOS EM DESTAQUE (com links funcionais) -->
+      <section class="secao">
+        <div class="secao-header">
+          <h2 class="secao-titulo">📺 ÚLTIMOS VÍDEOS</h2>
+          <a href="#" class="ver-todas">Ver todos →</a>
+        </div>
+        <div class="videos-grid">
+          <div class="video-card" data-video="https://www.youtube.com/watch?v=example1">
+            <div class="video-thumb"><span class="video-icon">🎥</span><span class="video-dur">5:32</span><div class="play-btn">▶</div></div>
+            <div class="video-info"><span class="video-cat">Resumo da semana</span><h4>Resumo da semana: principais acontecimentos da cidade</h4></div>
+          </div>
+          <div class="video-card" data-video="https://www.youtube.com/watch?v=example2">
+            <div class="video-thumb vt2"><span class="video-icon">🎙️</span><span class="video-dur">12:08</span><div class="play-btn">▶</div></div>
+            <div class="video-info"><span class="video-cat">Entrevista</span><h4>Entrevista exclusiva com o prefeito sobre as obras</h4></div>
+          </div>
+          <div class="video-card" data-video="https://www.youtube.com/watch?v=example3">
+            <div class="video-thumb vt3"><span class="video-icon">🎵</span><span class="video-dur">8:21</span><div class="play-btn">▶</div></div>
+            <div class="video-info"><span class="video-cat">Entretenimento</span><h4>Bastidores do festival que parou a cidade</h4></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ESPORTES / ENTRETENIMENTO / UTILIDADE PÚBLICA (grid) -->
+      <section class="secao">
+        <div class="cards-grid">
+          <a href="noticia-esporte.html" style="text-decoration: none; color: inherit;">
+            <article class="card fade-in">
+              <div class="card-img-wrap">
+                <div class="card-img-ph"><span>⚽</span></div>
+                <span class="badge badge-esportes">Esportes</span>
+              </div>
+              <div class="card-body">
+                <h3 class="card-titulo">Time local vence clássico e assume a liderança do campeonato</h3>
+                <p class="card-resumo">Vitória por 3 a 1 levou estádio à loucura e recolocou a equipe na ponta da tabela.</p>
+                <div class="card-meta">
+                  <span>✍️ Coluna do Esporte</span>
+                  <span>🕐 há 6 h</span>
+                </div>
+              </div>
+            </article>
+          </a>
+          <a href="noticia-festival.html" style="text-decoration: none; color: inherit;">
+            <article class="card fade-in">
+              <div class="card-img-wrap">
+                <div class="card-img-ph"><span>🎶</span></div>
+                <span class="badge badge-entret">Entretenimento</span>
+              </div>
+              <div class="card-body">
+                <h3 class="card-titulo">Festival de música movimenta a cidade e atrai milhares de visitantes</h3>
+                <p class="card-resumo">Evento gratuito reúne grandes nomes do samba, pagode e MPB.</p>
+                <div class="card-meta">
+                  <span>✍️ Cultura & Lazer</span>
+                  <span>🕐 há 8 h</span>
+                </div>
+              </div>
+            </article>
+          </a>
+          <a href="noticia-transito.html" style="text-decoration: none; color: inherit;">
+            <article class="card fade-in">
+              <div class="card-img-wrap">
+                <div class="card-img-ph"><span>🚦</span></div>
+                <span class="badge badge-util">Utilidade Pública</span>
+              </div>
+              <div class="card-body">
+                <h3 class="card-titulo">Trânsito terá bloqueios no fim de semana por causa de evento esportivo</h3>
+                <p class="card-resumo">Confira os horários, ruas interditadas e rotas alternativas sugeridas pela prefeitura.</p>
+                <div class="card-meta">
+                  <span>✍️ Redação</span>
+                  <span>🕐 há 10 h</span>
+                </div>
+              </div>
+            </article>
+          </a>
+        </div>
+      </section>
+
+      <!-- GALERIA DE FOTOS -->
+      <section class="secao">
+        <div class="secao-header">
+          <h2 class="secao-titulo">📸 GALERIA DE FOTOS</h2>
+          <a href="#" class="ver-todas">Ver galeria →</a>
+        </div>
+        <div class="galeria-grid">
+          <div class="galeria-item"><div class="gal-ph"><span>🚔</span></div><p>Operação policial no Centro</p></div>
+          <div class="galeria-item"><div class="gal-ph gp2"><span>🏛️</span></div><p>Sessão na Câmara Municipal</p></div>
+          <div class="galeria-item"><div class="gal-ph gp3"><span>⚽</span></div><p>Clássico regional no estádio</p></div>
+          <div class="galeria-item"><div class="gal-ph gp4"><span>🎶</span></div><p>Show no Festival de Música</p></div>
+          <div class="galeria-item"><div class="gal-ph gp5"><span>🏗️</span></div><p>Obras nos bairros da cidade</p></div>
+          <div class="galeria-item"><div class="gal-ph gp6"><span>🌧️</span></div><p>Frente fria atinge a região</p></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SIDEBAR (MAIS LIDAS, ÚLTIMAS ATUALIZAÇÕES, ANÚNCIOS, REDES, FALE CONOSCO) -->
+    <aside class="sidebar">
+      <div class="widget">
+        <h3 class="widget-titulo">🔥 MAIS LIDAS</h3>
+        <ol class="mais-lidas-list">
+          <li><a href="#">Time local vence clássico e assume a liderança do campeonato</a></li>
+          <li><a href="#">Operação policial desarticula quadrilha no Centro e apreende drogas</a></li>
+          <li><a href="#">Seleção convoca jogadores para as próximas Eliminatórias</a></li>
+          <li><a href="#">Preso suspeito de série de assaltos a comércios na zona sul</a></li>
+          <li><a href="#">Prefeitura anuncia pacote de obras em 12 bairros</a></li>
+        </ol>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-titulo">🕐 ÚLTIMAS ATUALIZAÇÕES</h3>
+        <ul class="ultimas-list">
+          <li><span class="upd-time">15:09</span><a href="#">Operação policial prende mais um suspeito no Centro</a></li>
+          <li><span class="upd-time">14:52</span><a href="#">Prefeitura divulga novo cronograma de obras</a></li>
+          <li><span class="upd-time">14:30</span><a href="#">Frente fria: alerta para queda brusca de temperatura</a></li>
+          <li><span class="upd-time">13:47</span><a href="#">Time local se prepara para próximo confronto</a></li>
+          <li><span class="upd-time">12:15</span><a href="#">Avenida Brasil terá bloqueio parcial amanhã</a></li>
+        </ul>
+      </div>
+
+      <div class="widget anuncio-box anuncio-300">
+        <div class="anuncio-inner">
+          <span class="anuncio-label">Publicidade</span>
+          <div class="anuncio-content">
+            <span>📢</span>
+            <p>Anuncie aqui!</p>
+            <small>300 × 250</small>
+            <a href="https://wa.me/5565961197971" target="_blank" class="btn-anuncio">Fale conosco</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-titulo">📱 SIGA NAS REDES</h3>
+        <div class="redes-btns">
+          <a href="#" class="rede-btn rede-fb">📘 Facebook</a>
+          <a href="#" class="rede-btn rede-ig">📸 Instagram</a>
+          <a href="#" class="rede-btn rede-yt">▶️ YouTube</a>
+          <a href="https://wa.me/5565961197971" target="_blank" class="rede-btn rede-wa">💬 WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-titulo">📞 FALE CONOSCO</h3>
+        <div class="anuncio-inner" style="padding: 16px; text-align: center;">
+          <p style="margin-bottom: 8px;">Entre em contato com a redação</p>
+          <a href="https://wa.me/5565961197971" target="_blank" class="btn-anuncio">WhatsApp: (65) 9611-9797</a>
+          <p style="margin-top: 12px; font-size: 12px;">email: contato@sergiolapada.com</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-col">
+        <div class="footer-logo">📰 Repórter Serginho Lapada</div>
+        <p class="footer-sobre">Portal de notícias com cobertura completa de polícia, política, cidades, esportes, entretenimento e utilidade pública. Informação rápida, apurada e com atitude.</p>
+        <p class="footer-whats">📲 WhatsApp da redação: <a href="https://wa.me/5565961197971" target="_blank">+55 65 9611-9797</a></p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-h4">LINKS RÁPIDOS</h4>
+        <ul class="footer-links">
+          <li><a href="#">Home</a></li><li><a href="#">Últimas notícias</a></li>
+          <li><a href="#">Vídeos</a></li><li><a href="#">Contato</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-h4">INSTITUCIONAL</h4>
+        <ul class="footer-links">
+          <li><a href="#">Sobre o portal</a></li><li><a href="#">Política de Privacidade</a></li>
+          <li><a href="#">Termos de Uso</a></li><li><a href="#">Anuncie aqui</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-copy">
+      <div class="container">© 2026 Repórter Serginho Lapada. Todos os direitos reservados. Feito com paixão por jornadas no local.</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
