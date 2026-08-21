@@ -91,3 +91,42 @@ document.querySelectorAll('.video-card').forEach(video => {
 
 // PREVENÇÃO DE CLIQUE EM LINKS # (apenas exemplo)
 document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('lapada_dados.json')
+    .then(res => {
+      if (!res.ok) throw new Error('Arquivo JSON não encontrado');
+      return res.json();
+    })
+    .then(dados => {
+      // Exibir notícias
+      const containerNoticias = document.querySelector('.news-grid');
+      if (containerNoticias && dados.noticias) {
+        containerNoticias.innerHTML = dados.noticias.map(not => `
+          <article class="news-card">
+            <div class="card-body">
+              <h3>${not.titulo}</h3>
+              <p>${not.resumo}</p>
+              <div class="card-footer">
+                <span>✍️ ${not.autor}</span>
+                <span>🕒 ${not.tempo}</span>
+              </div>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      // Exibir desaparecidos
+      const containerDesaparecidos = document.querySelector('.desaparecidos-grid');
+      if (containerDesaparecidos && dados.desaparecidos) {
+        containerDesaparecidos.innerHTML = dados.desaparecidos.map(des => `
+          <div class="desaparecido-card">
+            <img src="${des.foto}" alt="${des.nome}" onerror="this.src='https://via.placeholder.com/150'">
+            <h4>${des.nome}</h4>
+            <p>${des.descricao}</p>
+          </div>
+        `).join('');
+      }
+    })
+    .catch(err => console.error('Erro ao carregar dados:', err));
+});

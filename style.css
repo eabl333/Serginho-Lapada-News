@@ -2379,3 +2379,34 @@ a { text-decoration: none; color: inherit; }
       font-size: 13px;
     }
   }
+
+  .desaparecidos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.desaparecido-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+.desaparecido-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+.desaparecido-card h4 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+  color: #e63946;
+}
+.desaparecido-card p {
+  font-size: 0.8rem;
+  color: #555;
+}

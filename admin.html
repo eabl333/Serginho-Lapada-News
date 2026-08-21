@@ -1,0 +1,214 @@
+eu to colocando os no codigo direto no github vou colar no git hub <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo – Serginho Lapada</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; color: #333; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1, h2 { font-family: Georgia, serif; color: #1a1a1a; }
+        h1 { text-align: center; color: #e63946; margin-bottom: 20px; }
+        h2 { margin: 25px 0 12px; border-bottom: 2px solid #e63946; padding-bottom: 8px; }
+        .form-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .form-group input, .form-group textarea, .form-group select { flex: 1; min-width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; }
+        button { background: #e63946; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #c1121f; }
+        .list-item { background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .list-item strong { display: block; font-size: 16px; }
+        .list-item small { color: #777; }
+        .btn-excluir { background: #dc3545; }
+        .btn-exportar, .btn-importar { background: #007bff; }
+        .acoes { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .galeria-list { display: flex; flex-wrap: wrap; gap: 15px; }
+        .galeria-item { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px; text-align: center; width: 180px; }
+        .galeria-item img { width: 100%; height: auto; border-radius: 6px; }
+        .galeria-item p { font-size: 12px; color: #555; margin-top: 6px; }
+        .galeria-item button { margin-top: 6px; background: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 PAINEL LAPADA NEWS</h1>
+
+        <h2>➕ Nova Notícia</h2>
+        <div class="form-group">
+            <input id="notTitulo" placeholder="Título da notícia">
+            <select id="notCategoria">
+                <option value="Polícia">Polícia</option>
+                <option value="Política">Política</option>
+                <option value="Cidades">Cidades</option>
+                <option value="Esportes">Esportes</option>
+                <option value="Entretenimento">Entretenimento</option>
+                <option value="Comunidade">Comunidade</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <textarea id="notResumo" placeholder="Resumo da notícia"></textarea>
+        </div>
+        <div class="form-group">
+            <input id="notAutor" placeholder="Autor (ex: Serginho Lapada)">
+            <input id="notTempo" placeholder="Tempo (ex: há 35 min)">
+        </div>
+        <button onclick="adicionarNoticia()">Salvar Notícia</button>
+
+        <h2>🖼️ Nova Imagem na Galeria de Desaparecidos</h2>
+        <div class="form-group">
+            <input id="desNome" placeholder="Nome da pessoa">
+            <input id="desFoto" placeholder="URL da foto (ou use emoji)">
+        </div>
+        <div class="form-group">
+            <textarea id="desDesc" placeholder="Descrição, cidade, contato..."></textarea>
+        </div>
+        <button onclick="adicionarDesaparecido()">Salvar Desaparecido</button>
+
+        <h2>📋 Notícias Cadastradas</h2>
+        <div id="listaNoticias"></div>
+
+        <h2>🔍 Desaparecidos Cadastrados</h2>
+        <div class="galeria-list" id="listaDesaparecidos"></div>
+
+        <div class="acoes">
+            <button class="btn-exportar" onclick="exportarDados()">📤 Exportar Dados</button>
+            <button class="btn-importar" onclick="importarDados()">📥 Importar Dados</button>
+        </div>
+    </div>
+
+    <script>
+        // Funções para manipular localStorage
+        const STORAGE_KEY_NOTICIAS = 'lapada_noticias';
+        const STORAGE_KEY_DESAPARECIDOS = 'lapada_desaparecidos';
+
+        function obterNoticias() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_NOTICIAS) || '[]');
+        }
+
+        function obterDesaparecidos() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_DESAPARECIDOS) || '[]');
+        }
+
+        function salvarNoticias(lista) {
+            localStorage.setItem(STORAGE_KEY_NOTICIAS, JSON.stringify(lista));
+            renderizarNoticias();
+        }
+
+        function salvarDesaparecidos(lista) {
+            localStorage.setItem(STORAGE_KEY_DESAPARECIDOS, JSON.stringify(lista));
+            renderizarDesaparecidos();
+        }
+
+        function adicionarNoticia() {
+            const titulo = document.getElementById('notTitulo').value.trim();
+            const categoria = document.getElementById('notCategoria').value;
+            const resumo = document.getElementById('notResumo').value.trim();
+            const autor = document.getElementById('notAutor').value.trim() || 'Serginho Lapada';
+            const tempo = document.getElementById('notTempo').value.trim() || 'agora';
+            if (!titulo || !resumo) { alert('Preencha título e resumo'); return; }
+            const noticias = obterNoticias();
+            noticias.push({ titulo, categoria, resumo, autor, tempo, id: Date.now() });
+            salvarNoticias(noticias);
+            limparFormNoticia();
+        }
+
+        function adicionarDesaparecido() {
+            const nome = document.getElementById('desNome').value.trim();
+            const foto = document.getElementById('desFoto').value.trim() || '👤';
+            const descricao = document.getElementById('desDesc').value.trim();
+            if (!nome || !descricao) { alert('Preencha nome e descrição'); return; }
+            const desaparecidos = obterDesaparecidos();
+            desaparecidos.push({ nome, foto, descricao, id: Date.now() });
+            salvarDesaparecidos(desaparecidos);
+            limparFormDesaparecido();
+        }
+
+        function renderizarNoticias() {
+            const lista = obterNoticias();
+            const container = document.getElementById('listaNoticias');
+            if (lista.length === 0) {
+                container.innerHTML = '<p>Nenhuma notícia cadastrada.</p>';
+                return;
+            }
+            container.innerHTML = lista.map(not => `
+                <div class="list-item">
+                    <div>
+                        <strong>${not.titulo}</strong>
+                        <small>${not.categoria} | ${not.autor} | ${not.tempo}</small>
+                        <p>${not.resumo}</p>
+                    </div>
+                    <button class="btn-excluir" onclick="excluirNoticia(${not.id})">Excluir</button>
+                </div>
+            `).join('');
+        }
+
+        function renderizarDesaparecidos() {
+            const lista = obterDesaparecidos();
+            const container = document.getElementById('listaDesaparecidos');
+            if (lista.length === 0) {
+                container.innerHTML = '<p>Nenhum desaparecido cadastrado.</p>';
+                return;
+            }
+            container.innerHTML = lista.map(des => `
+                <div class="galeria-item">
+                    <img src="${des.foto}" alt="${des.nome}" onerror="this.src='https://via.placeholder.com/150'">
+                    <p><strong>${des.nome}</strong></p>
+                    <p>${des.descricao}</p>
+                    <button class="btn-excluir" onclick="excluirDesaparecido(${des.id})">Excluir</button>
+                </div>
+            `).join('');
+        }
+
+        function excluirNoticia(id) {
+            if (confirm('Excluir esta notícia?')) {
+                salvarNoticias(obterNoticias().filter(n => n.id !== id));
+            }
+        }
+
+        function excluirDesaparecido(id) {
+            if (confirm('Excluir este desaparecido?')) {
+                salvarDesaparecidos(obterDesaparecidos().filter(d => d.id !== id));
+            }
+        }
+
+        function limparFormNoticia() {
+            ['notTitulo','notResumo','notAutor','notTempo'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function limparFormDesaparecido() {
+            ['desNome','desFoto','desDesc'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function exportarDados() {
+            const dados = {
+                noticias: obterNoticias(),
+                desaparecidos: obterDesaparecidos()
+            };
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'lapada_dados.json';
+            a.click();
+        }
+
+        function importarDados() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                const text = await file.text();
+                const dados = JSON.parse(text);
+                if (dados.noticias) salvarNoticias(dados.noticias);
+                if (dados.desaparecidos) salvarDesaparecidos(dados.desaparecidos);
+                alert('Dados importados!');
+            };
+            input.click();
+        }
+
+        // Renderizar inicial
+        renderizarNoticias();
+        renderizarDesaparecidos();
+    </script>
+</body>
+</html>
