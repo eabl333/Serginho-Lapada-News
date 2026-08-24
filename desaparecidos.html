@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desaparecidos - Serginho Lapada</title>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f4f4;
+            color: #0B0B0B;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        .header-page {
+            border-bottom: 3px solid #E10600;
+            padding-bottom: 15px;
+            margin: 30px 0;
+        }
+        .header-page h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-page h1 i {
+            color: #E10600;
+            font-size: 2.2rem;
+        }
+        .header-page p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .filtros {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            align-items: center;
+        }
+        .filtros select,
+        .filtros input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .filtros select:focus,
+        .filtros input:focus {
+            border-color: #E10600;
+            outline: none;
+        }
+        .filtros select option i {
+            margin-right: 6px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .card .foto {
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: rgba(255,255,255,0.15);
+            font-size: 4rem;
+        }
+        .card .foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card .info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .card .info h4 {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        .card .info .status {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            align-self: flex-start;
+        }
+        .card .info .status i {
+            margin-right: 4px;
+        }
+        .status-desaparecido {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .status-localizado {
+            background: #27ae60;
+            color: #fff;
+        }
+        .card .info p {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            grid-column: 1/-1;
+            font-size: 18px;
+        }
+        .loading i {
+            margin-right: 10px;
+        }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #0B0B0B;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .btn-voltar:hover {
+            background: #E10600;
+        }
+
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            grid-column: 1/-1;
+            font-size: 1.1rem;
+        }
+        .vazio i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .header-page h1 {
+                font-size: 1.8rem;
+                flex-wrap: wrap;
+            }
+            .filtros {
+                flex-direction: column;
+            }
+            .filtros select,
+            .filtros input {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" style="padding-top:30px; padding-bottom:30px;">
+        <a href="index.html" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar para o início
+        </a>
+
+        <div class="header-page">
+            <h1>
+                <i class="fas fa-magnifying-glass"></i> PESSOAS DESAPARECIDAS
+            </h1>
+        </div>
+
+        <div class="filtros">
+            <select id="filtroStatus" onchange="carregarDesaparecidos()">
+                <option value="Todos">Todos os status</option>
+                <option value="Desaparecido"><i class="fas fa-circle" style="color:#e74c3c;"></i> Desaparecido</option>
+                <option value="Localizado"><i class="fas fa-check-circle" style="color:#27ae60;"></i> Localizado</option>
+            </select>
+            <input type="text" id="filtroCidade" placeholder="Filtrar por cidade..." oninput="carregarDesaparecidos()">
+        </div>
+
+        <div class="grid" id="listaDesaparecidos">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Carregando desaparecidos...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function carregarDesaparecidos() {
+            const status = document.getElementById('filtroStatus').value;
+            const cidade = document.getElementById('filtroCidade').value.toLowerCase().trim();
+            const container = document.getElementById('listaDesaparecidos');
+            container.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+            `;
+
+            try {
+                let query = supabaseClient.from('desaparecidos').select('*').order('created_at', { ascending: false });
+                if (status !== 'Todos') query = query.eq('status', status);
+                const { data, error } = await query;
+                if (error) throw error;
+
+                let filtrados = data || [];
+                if (cidade) filtrados = filtrados.filter(d => d.cidade && d.cidade.toLowerCase().includes(cidade));
+
+                if (filtrados.length === 0) {
+                    container.innerHTML = `
+                        <div class="vazio">
+                            <i class="fas fa-user-slash"></i>
+                            Nenhum desaparecido encontrado.
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = filtrados.map(des => `
+                    <div class="card">
+                        <div class="foto">
+                            ${des.imagem_url ? `<img src="${des.imagem_url}" alt="${des.nome}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-user-circle\\'></i>';">` : `<i class="fas fa-user-circle"></i>`}
+                        </div>
+                        <div class="info">
+                            <h4>${des.nome}</h4>
+                            ${des.idade ? `<span style="font-size:13px; color:#666;">${des.idade} anos</span>` : ''}
+                            ${des.cidade ? `<span style="font-size:13px; color:#666;"> - ${des.cidade}</span>` : ''}
+                            <br>
+                            <span class="status ${des.status === 'Localizado' ? 'status-localizado' : 'status-desaparecido'}">
+                                <i class="${des.status === 'Localizado' ? 'fas fa-check-circle' : 'fas fa-circle'}"></i>
+                                ${des.status || 'Desaparecido'}
+                            </span>
+                            <p>${des.descricao}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                container.innerHTML = `
+                    <div style="color:#e74c3c; grid-column:1/-1; text-align:center; padding:20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Carrega ao iniciar
+        carregarDesaparecidos();
+    </script>
+</body>
+</html>

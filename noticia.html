@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notícia - Serginho Lapada</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; color: #0B0B0B; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .noticia-completa { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .noticia-img {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #2d2d3f, #1a1a2e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+        .noticia-corpo { padding: 30px; }
+        .noticia-completa h1 { font-size: 2.5rem; margin: 15px 0; }
+        .noticia-completa .meta { display: flex; gap: 20px; color: #666; margin-bottom: 20px; flex-wrap: wrap; }
+        .noticia-completa .resumo-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; font-size: 1.2rem; color: #333; }
+        .noticia-completa .conteudo { font-size: 1.1rem; line-height: 1.8; color: #444; }
+        .cat-label {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .cat-policia { background: #c0392b; color: #fff; }
+        .cat-politica { background: #2980b9; color: #fff; }
+        .cat-cidades { background: #27ae60; color: #fff; }
+        .cat-esportes { background: #f39c12; color: #fff; }
+        .cat-geral { background: #7f8c8d; color: #fff; }
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .btn-voltar {
+            display: inline-block;
+            background: #0B0B0B;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .btn-voltar:hover { background: #E10600; }
+        .btn-link-externo {
+            display: inline-block;
+            background: #E10600;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .btn-link-externo:hover { background: #0B0B0B; }
+        .compartilhar { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px; }
+        .compartilhar a {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #fff;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        .whatsapp { background: #25d366; }
+        .facebook { background: #1877f2; }
+        .twitter { background: #1da1f2; }
+    </style>
+</head>
+<body>
+
+    <div class="container" style="padding-top:30px; padding-bottom:30px;">
+        <a href="index.html" class="btn-voltar">← Voltar para o início</a>
+        <div id="conteudoNoticia" class="noticia-completa">
+            <div class="loading">⏳ Carregando notícia...</div>
+        </div>
+    </div>
+
+    <script>
+        async function carregarNoticia() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) {
+                document.getElementById('conteudoNoticia').innerHTML = '<div style="color:red; padding:30px;">❌ Notícia não encontrada</div>';
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient.from('noticias').select('*').eq('id', id).single();
+                if (error) throw error;
+                if (!data) {
+                    document.getElementById('conteudoNoticia').innerHTML = '<div style="color:red; padding:30px;">❌ Notícia não encontrada</div>';
+                    return;
+                }
+                document.getElementById('conteudoNoticia').innerHTML = `
+                    <div class="noticia-img" style="${data.imagem_url ? `background-image:url('${data.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                        ${!data.imagem_url ? '' : ''}
+                    </div>
+                    <div class="noticia-corpo">
+                        <span class="cat-label cat-${(data.categoria || 'geral').toLowerCase()}">${data.categoria || 'Geral'}</span>
+                        <h1>${data.titulo}</h1>
+                        <div class="meta">
+                            <span>✍️ ${data.autor || 'Serginho Lapada'}</span>
+                            <span>🕐 ${data.Tempo || 'agora'}</span>
+                            <span>📅 ${new Date(data.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div class="resumo-box">${data.resumo}</div>
+                        <div class="conteudo">${data.conteudo || 'Conteúdo completo em breve...'}</div>
+                        ${data.link_externo ? `<a href="${data.link_externo}" target="_blank" class="btn-link-externo">🔗 Ver notícia completa</a>` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('conteudoNoticia').innerHTML = `<div style="color:red; padding:30px;">❌ Erro: ${error.message}</div>`;
+            }
+        }
+        carregarNoticia();
+    </script>
+</body>
+</html>

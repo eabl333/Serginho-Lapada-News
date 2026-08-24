@@ -1,335 +1,943 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repórter Serginho Lapada – Notícias com atitude</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repórter Serginho Lapada – Notícias com atitude</title>
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1BR1YQ8RK"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-J1BR1YQ8RK');
-  </script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+
+    <!-- Font Awesome (para todos os ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        /* ===== RESET & VARIÁVEIS ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --preto: #0B0B0B;
+            --vermelho: #E10600;
+            --branco: #FFFFFF;
+            --cinza-claro: #F4F4F4;
+            --cinza-texto: #666666;
+            --sombra: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--cinza-claro);
+            color: var(--preto);
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; height: auto; display: block; }
+        ul, ol { list-style: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* ===== TOPO (com relógio e ícones SVG) ===== */
+        .topo-bar {
+            background: var(--preto);
+            color: var(--branco);
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        .topo-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .topo-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .topo-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+        .topo-links a:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.15);
+            transform: scale(1.1);
+        }
+        .topo-links svg {
+            fill: currentColor;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== PLANTÃO ===== */
+        .plantao-bar {
+            background: var(--vermelho);
+            color: var(--branco);
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .plantao-label {
+            background: var(--preto);
+            padding: 8px 20px;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        .plantao-track-wrap { flex: 1; overflow: hidden; }
+        .plantao-track {
+            display: flex;
+            gap: 60px;
+            animation: scrollPlantao 25s linear infinite;
+            white-space: nowrap;
+            padding: 0 20px;
+        }
+        .plantao-track span { font-size: 14px; font-weight: 600; flex-shrink: 0; }
+        @keyframes scrollPlantao {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .plantao-track:hover { animation-play-state: paused; }
+
+        /* ===== HEADER ===== */
+        .site-header {
+            background: var(--branco);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--vermelho);
+        }
+        .logo-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--preto);
+            line-height: 1.1;
+        }
+        .logo-slogan {
+            font-size: 0.7rem;
+            color: var(--vermelho);
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .main-nav {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .main-nav a {
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--preto);
+            border-radius: 6px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .main-nav a i {
+            font-size: 16px;
+        }
+        .main-nav a:hover {
+            background: var(--vermelho);
+            color: var(--branco);
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--preto);
+            padding: 5px 10px;
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 30px;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        /* ===== DESTAQUE ===== */
+        .destaque-section { margin-bottom: 30px; }
+        .destaque-card {
+            background: var(--branco);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: var(--transition);
+        }
+        .destaque-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .destaque-img {
+            position: relative;
+            height: 350px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .destaque-placeholder {
+            font-size: 4rem;
+            color: rgba(255,255,255,0.2);
+        }
+        .badge-urgente {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--vermelho);
+            color: var(--branco);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            animation: pulseUrgente 2s infinite;
+        }
+        @keyframes pulseUrgente {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .destaque-body { padding: 25px; }
+        .cat-label {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .cat-policia { background: #c0392b; color: #fff; }
+        .cat-politica { background: #2980b9; color: #fff; }
+        .cat-cidades { background: #27ae60; color: #fff; }
+        .cat-esportes { background: #f39c12; color: #fff; }
+        .cat-geral { background: #7f8c8d; color: #fff; }
+        .destaque-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .destaque-resumo {
+            font-size: 1.1rem;
+            color: var(--cinza-texto);
+            margin-bottom: 15px;
+        }
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .meta-autor { font-weight: 600; }
+        .meta-tempo { color: var(--cinza-texto); font-size: 14px; }
+        .btn-leia {
+            background: var(--vermelho);
+            color: var(--branco);
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+        }
+        .btn-leia:hover { background: var(--preto); transform: scale(1.02); }
+
+        /* ===== SEÇÕES ===== */
+        .secao { margin-bottom: 35px; }
+        .secao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 3px solid var(--vermelho);
+            padding-bottom: 8px;
+        }
+        .secao-titulo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .secao-titulo i {
+            color: var(--vermelho);
+            font-size: 1.6rem;
+        }
+        .ver-todas {
+            color: var(--vermelho);
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .ver-todas:hover { opacity: 0.7; }
+
+        /* ===== CARDS DE NOTÍCIAS ===== */
+        .card {
+            background: var(--branco);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: var(--transition);
+            margin-bottom: 18px;
+        }
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+        }
+        .card-img-wrap {
+            position: relative;
+            height: 180px;
+            background: linear-gradient(135deg, #2d2d3f, #1a1a2e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-img-ph {
+            font-size: 3rem;
+            color: rgba(255,255,255,0.15);
+        }
+        .badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .badge-policia { background: #c0392b; }
+        .badge-politica { background: #2980b9; }
+        .badge-cidades { background: #27ae60; }
+        .badge-esportes { background: #f39c12; }
+        .badge-geral { background: #7f8c8d; }
+        .card-body { padding: 18px; }
+        .card-titulo {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .card-titulo a:hover { color: var(--vermelho); }
+        .card-resumo {
+            color: var(--cinza-texto);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .card-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--cinza-texto);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .cards-grid .card { margin-bottom: 0; }
+
+        /* ===== DESAPARECIDOS ===== */
+        .desaparecidos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .desaparecido-card {
+            background: var(--branco);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: var(--transition);
+        }
+        .desaparecido-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+        .desaparecido-foto {
+            height: 180px;
+            background: linear-gradient(135deg, #2d2d3f, #1a1a2e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .desaparecido-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .desaparecido-info {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .desaparecido-info h4 {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        .desaparecido-info .status {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            align-self: flex-start;
+        }
+        .status-desaparecido { background: #e74c3c; color: #fff; }
+        .status-localizado { background: #27ae60; color: #fff; }
+        .desaparecido-info p {
+            font-size: 13px;
+            color: var(--cinza-texto);
+            margin: 4px 0;
+        }
+        .desaparecido-info .btn-leia {
+            align-self: flex-end;
+            margin-top: 4px;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .widget {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--sombra);
+            margin-bottom: 25px;
+        }
+        .widget-titulo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--vermelho);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .widget-titulo i {
+            color: var(--vermelho);
+        }
+        .widget-social {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .widget-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 24px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .widget-social a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* ===== WHATSAPP FLUTUANTE ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #25d366;
+            color: #fff;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: var(--transition);
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            background: var(--preto);
+            color: var(--branco);
+            padding: 40px 0 0;
+            margin-top: 30px;
+        }
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            padding-bottom: 30px;
+        }
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-logo i {
+            color: var(--vermelho);
+        }
+        .footer-sobre {
+            color: #aaa;
+            font-size: 14px;
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+        .footer-h4 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--branco);
+        }
+        .footer-links li { margin-bottom: 8px; }
+        .footer-links a {
+            color: #aaa;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .footer-links a:hover { color: var(--vermelho); }
+        .footer-copy {
+            border-top: 1px solid #222;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--cinza-texto);
+            font-size: 18px;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr 280px; }
+        }
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .menu-toggle { display: block; }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                padding: 15px 0;
+                gap: 5px;
+            }
+            .main-nav.aberto { display: flex; }
+            .main-nav a {
+                padding: 10px 15px;
+                border-bottom: 1px solid #eee;
+            }
+            .destaque-img { height: 250px; }
+            .destaque-title { font-size: 1.5rem; }
+            .footer-inner { grid-template-columns: 1fr; gap: 25px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .desaparecidos-grid { grid-template-columns: repeat(2, 1fr); }
+            .logo-title { font-size: 1.3rem; }
+        }
+        @media (max-width: 480px) {
+            .desaparecidos-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .destaque-img { height: 180px; }
+            .destaque-title { font-size: 1.2rem; }
+        }
+        .topo-links {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.topo-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #fff;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    text-decoration: none;
+    font-size: 16px;
+}
+.topo-links a:hover {
+    opacity: 1;
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.1);
+}
+    </style>
 </head>
 <body>
 
-  <!-- TOPO: DATA/HORA + REDES SOCIAIS -->
-  <div class="topo-bar">
-    <div class="container topo-inner">
-      <span id="relogio">Carregando...</span>
-      <div class="topo-links">
-        <a href="#">Facebook</a>
-        <a href="#">Instagram</a>
-        <a href="#">YouTube</a>
-        <a href="https://wa.me/5565961197971" target="_blank">WhatsApp</a>
-      </div>
+    <!-- ===== TOPO ===== -->
+    <div class="topo-bar">
+       <div class="container topo-inner">
+           <span id="relogio">Carregando...</span>
+           <div class="topo-links">
+              <a href="#" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+               </a>
+              <a href="#" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+              <a href="https://wa.me/5565961197971" target="_blank" aria-label="WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
     </div>
-  </div>
 
-  <!-- BARRA PLANTÃO (exatamente como nas imagens) -->
-  <div class="plantao-bar">
-    <span class="plantao-label">PLANTÃO</span>
-    <div class="plantao-track-wrap">
-      <div class="plantao-track" id="plantaoTrack">
-        <span>🚨 Acompanhe a sessão da Câmara</span>
-        <span>🌡️ TEMPO: Frente fria chega à região nas próximas horas</span>
-        <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total no sentido bairro</span>
-        <span>⚽ ESPORTES: Time local goleia adversário e assume liderança</span>
-        <span>🚨 Operação policial desarticula quadrilha no Centro</span>
-        <!-- repetido para efeito infinito -->
-        <span>🚨 Acompanhe a sessão da Câmara</span>
-        <span>🌡️ TEMPO: Frente fria chega à região nas próximas horas</span>
-        <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total no sentido bairro</span>
-      </div>
+    <!-- ===== PLANTÃO ===== -->
+    <div class="plantao-bar">
+        <span class="plantao-label">PLANTÃO</span>
+        <div class="plantao-track-wrap">
+            <div class="plantao-track" id="plantaoTrack">
+                <span>🚨 Acompanhe a sessão da Câmara</span>
+                <span>🌡️ TEMPO: Frente fria chega à região nas próximas horas</span>
+                <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total</span>
+                <span>⚽ ESPORTES: Time local goleia e assume liderança</span>
+                <span>🚨 Operação policial desarticula quadrilha no Centro</span>
+                <span>🚨 Acompanhe a sessão da Câmara</span>
+                <span>🌡️ TEMPO: Frente fria chega à região</span>
+                <span>🚧 TRÂNSITO: Avenida Brasil tem bloqueio total</span>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <div class="logo-area">
-        <div class="logo-icon">📰</div>
-        <div>
-          <div class="logo-title">Repórter Serginho Lapada</div>
-          <div class="logo-slogan">NOTÍCIAS COM ATITUDE</div>
+    <!-- ===== HEADER ===== -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="logo-area">
+                <a href="#" class="logo-link">
+                    <i class="fas fa-newspaper logo-icon"></i>
+                    <div>
+                        <div class="logo-title">Repórter Serginho Lapada</div>
+                        <div class="logo-slogan">NOTÍCIAS COM ATITUDE</div>
+                    </div>
+                </a>
+            </div>
+            <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="categoria.html?cat=Polícia"><i class="fas fa-shield-halved"></i> Polícia</a>
+                <a href="categoria.html?cat=Política"><i class="fas fa-landmark"></i> Política</a>
+                <a href="categoria.html?cat=Cidades"><i class="fas fa-city"></i> Cidades</a>
+                <a href="categoria.html?cat=Esportes"><i class="fas fa-futbol"></i> Esportes</a>
+                <a href="categoria.html?cat=Comunidade"><i class="fas fa-handshake"></i> Comunidade</a>
+                <a href="desaparecidos.html"><i class="fas fa-magnifying-glass"></i> Desaparecidos</a>
+            </nav>
         </div>
-      </div>
-      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
-      <nav class="main-nav" id="mainNav">
-        <a href="#">Home</a>
-        <a href="#">Últimas</a>
-        <a href="#">Polícia</a>
-        <a href="#">Política</a>
-        <a href="#">Cidades</a>
-        <a href="#">Esportes</a>
-        <a href="#">Entretenimento</a>
-        <a href="#">Vídeos</a>
-        <a href="#">Contato</a>
-      </nav>
-    </div>
-  </header>
+    </header>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="container main-layout">
+    <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+    <main class="container main-layout">
+        <div class="col-center">
 
-    <!-- COLUNA CENTRAL -->
-    <div class="col-center">
-
-      <!-- DESTAQUE PRINCIPAL (conforme imagem da polícia) -->
-      <section class="destaque-section">
-        <div class="destaque-card fade-in">
-          <div class="destaque-img">
-            <div class="destaque-placeholder">
-              <span class="destaque-icon">🚔</span>
-            </div>
-            <span class="badge badge-urgente">🚨 URGENTE</span>
-          </div>
-          <div class="destaque-body">
-            <span class="cat-label cat-policia">Polícia</span>
-            <h1 class="destaque-title">Operação policial desarticula quadrilha no Centro e apreende grande quantidade de drogas</h1>
-            <p class="destaque-resumo">Ação conjunta entre Polícia Civil e Militar resultou em cinco prisões na quadrilha desta terça-feira.</p>
-            <div class="meta-row">
-              <span class="meta-autor">✍️ Serginho Lapada</span>
-              <span class="meta-tempo">🕐 há 35 min</span>
-              <a href="noticia-policia.html" class="btn-leia">Leia mais →</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ÚLTIMAS NOTÍCIAS -->
-      <section class="secao">
-        <div class="secao-header">
-          <h2 class="secao-titulo">🗞️ ÚLTIMAS NOTÍCIAS</h2>
-          <a href="#" class="ver-todas">Ver todas →</a>
-        </div>
-        <a href="noticia-completa.html" style="text-decoration: none; color: inherit;">
-          <article class="card fade-in">
-            <div class="card-img-wrap">
-              <div class="card-img-ph"><span>👮</span></div>
-              <span class="badge badge-policia">Polícia</span>
-            </div>
-            <div class="card-body">
-              <h3 class="card-titulo">Operação policial desarticula quadrilha no Centro e apreende grande quantidade de drogas</h3>
-              <p class="card-resumo">Ação conjunta entre Polícia Civil e Militar resultou em cinco prisões...</p>
-              <div class="card-meta">
-                <span>✍️ Serginho Lapada</span>
-                <span>🕐 há 35 min</span>
-              </div>
-            </div>
-          </article>
-        </a>
-        <a href="noticia-obras.html" style="text-decoration: none; color: inherit;">
-          <article class="card fade-in">
-            <div class="card-img-wrap">
-              <div class="card-img-ph"><span>🏗️</span></div>
-              <span class="badge badge-cidades">Cidades</span>
-            </div>
-            <div class="card-body">
-              <h3 class="card-titulo">Prefeitura anuncia pacote de obras em 12 bairros para os próximos meses</h3>
-              <p class="card-resumo">Investimento ultrapassa R$ 80 milhões e prioriza pavimentação, iluminação e mobilidade.</p>
-              <div class="card-meta">
-                <span>✍️ Redação</span>
-                <span>🕐 há 2 h</span>
-              </div>
-            </div>
-          </article>
-        </a>
-      </section>
-
-      <!-- VÍDEOS EM DESTAQUE (com links funcionais) -->
-      <section class="secao">
-        <div class="secao-header">
-          <h2 class="secao-titulo">📺 ÚLTIMOS VÍDEOS</h2>
-          <a href="#" class="ver-todas">Ver todos →</a>
-        </div>
-        <div class="videos-grid">
-          <div class="video-card" data-video="https://www.youtube.com/watch?v=example1">
-            <div class="video-thumb"><span class="video-icon">🎥</span><span class="video-dur">5:32</span><div class="play-btn">▶</div></div>
-            <div class="video-info"><span class="video-cat">Resumo da semana</span><h4>Resumo da semana: principais acontecimentos da cidade</h4></div>
-          </div>
-          <div class="video-card" data-video="https://www.youtube.com/watch?v=example2">
-            <div class="video-thumb vt2"><span class="video-icon">🎙️</span><span class="video-dur">12:08</span><div class="play-btn">▶</div></div>
-            <div class="video-info"><span class="video-cat">Entrevista</span><h4>Entrevista exclusiva com o prefeito sobre as obras</h4></div>
-          </div>
-          <div class="video-card" data-video="https://www.youtube.com/watch?v=example3">
-            <div class="video-thumb vt3"><span class="video-icon">🎵</span><span class="video-dur">8:21</span><div class="play-btn">▶</div></div>
-            <div class="video-info"><span class="video-cat">Entretenimento</span><h4>Bastidores do festival que parou a cidade</h4></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ESPORTES / ENTRETENIMENTO / UTILIDADE PÚBLICA (grid) -->
-      <section class="secao">
-        <div class="cards-grid">
-          <a href="noticia-esporte.html" style="text-decoration: none; color: inherit;">
-            <article class="card fade-in">
-              <div class="card-img-wrap">
-                <div class="card-img-ph"><span>⚽</span></div>
-                <span class="badge badge-esportes">Esportes</span>
-              </div>
-              <div class="card-body">
-                <h3 class="card-titulo">Time local vence clássico e assume a liderança do campeonato</h3>
-                <p class="card-resumo">Vitória por 3 a 1 levou estádio à loucura e recolocou a equipe na ponta da tabela.</p>
-                <div class="card-meta">
-                  <span>✍️ Coluna do Esporte</span>
-                  <span>🕐 há 6 h</span>
+            <!-- DESTAQUE -->
+            <section class="destaque-section">
+                <div id="destaqueNoticia" class="destaque-card">
+                    <div class="loading"> Carregando destaque...</div>
                 </div>
-              </div>
-            </article>
-          </a>
-          <a href="noticia-festival.html" style="text-decoration: none; color: inherit;">
-            <article class="card fade-in">
-              <div class="card-img-wrap">
-                <div class="card-img-ph"><span>🎶</span></div>
-                <span class="badge badge-entret">Entretenimento</span>
-              </div>
-              <div class="card-body">
-                <h3 class="card-titulo">Festival de música movimenta a cidade e atrai milhares de visitantes</h3>
-                <p class="card-resumo">Evento gratuito reúne grandes nomes do samba, pagode e MPB.</p>
-                <div class="card-meta">
-                  <span>✍️ Cultura & Lazer</span>
-                  <span>🕐 há 8 h</span>
+            </section>
+
+            <!-- ÚLTIMAS NOTÍCIAS (lista) -->
+            <section class="secao" id="ultimas">
+                <div class="secao-header">
+                    <h2 class="secao-titulo"><i class="fas fa-newspaper"></i> ÚLTIMAS NOTÍCIAS</h2>
                 </div>
-              </div>
-            </article>
-          </a>
-          <a href="noticia-transito.html" style="text-decoration: none; color: inherit;">
-            <article class="card fade-in">
-              <div class="card-img-wrap">
-                <div class="card-img-ph"><span>🚦</span></div>
-                <span class="badge badge-util">Utilidade Pública</span>
-              </div>
-              <div class="card-body">
-                <h3 class="card-titulo">Trânsito terá bloqueios no fim de semana por causa de evento esportivo</h3>
-                <p class="card-resumo">Confira os horários, ruas interditadas e rotas alternativas sugeridas pela prefeitura.</p>
-                <div class="card-meta">
-                  <span>✍️ Redação</span>
-                  <span>🕐 há 10 h</span>
+                <div id="listaNoticias">
+                    <div class="loading"> Carregando notícias...</div>
                 </div>
-              </div>
-            </article>
-          </a>
+            </section>
+
+            <!-- GRID DE NOTÍCIAS (cards) -->
+            <section class="secao">
+                <div class="cards-grid" id="gridNoticias">
+                    <div class="loading" style="grid-column: 1/-1;"> Carregando mais notícias...</div>
+                </div>
+            </section>
+
+            <!-- DESAPARECIDOS -->
+            <section class="secao" id="desaparecidos">
+                <div class="secao-header">
+                    <h2 class="secao-titulo"><i class="fas fa-magnifying-glass"></i> PESSOAS DESAPARECIDAS</h2>
+                    <a href="desaparecidos.html" class="ver-todas">Ver todos →</a>
+                </div>
+                <div class="desaparecidos-grid" id="listaDesaparecidos">
+                    <div class="loading" style="grid-column: 1/-1;"> Carregando desaparecidos...</div>
+                </div>
+            </section>
         </div>
-      </section>
 
-      <!-- GALERIA DE FOTOS -->
-      <section class="secao">
-        <div class="secao-header">
-          <h2 class="secao-titulo">📸 GALERIA DE FOTOS</h2>
-          <a href="#" class="ver-todas">Ver galeria →</a>
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="widget">
+                <h3 class="widget-titulo"><i class="fas fa-share-alt"></i> SIGA NAS REDES</h3>
+                <div class="widget-social">
+                    <a href="#" style="background:#1877f2;" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" style="background:#e4405f;" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" style="background:#ff0000;" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://wa.me/5565961197971" target="_blank" style="background:#25d366;" aria-label="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-col">
+                <div class="footer-logo"><i class="fas fa-newspaper"></i> Repórter Serginho Lapada</div>
+                <p class="footer-sobre">Portal de notícias com cobertura completa de polícia, política, cidades, esportes, entretenimento e utilidade pública.</p>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-h4">LINKS RÁPIDOS</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="desaparecidos.html">Desaparecidos</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-h4">INSTITUCIONAL</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Sobre o portal</a></li>
+                    <li><a href="#">Anuncie aqui</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="galeria-grid">
-          <div class="galeria-item"><div class="gal-ph"><span>🚔</span></div><p>Operação policial no Centro</p></div>
-          <div class="galeria-item"><div class="gal-ph gp2"><span>🏛️</span></div><p>Sessão na Câmara Municipal</p></div>
-          <div class="galeria-item"><div class="gal-ph gp3"><span>⚽</span></div><p>Clássico regional no estádio</p></div>
-          <div class="galeria-item"><div class="gal-ph gp4"><span>🎶</span></div><p>Show no Festival de Música</p></div>
-          <div class="galeria-item"><div class="gal-ph gp5"><span>🏗️</span></div><p>Obras nos bairros da cidade</p></div>
-          <div class="galeria-item"><div class="gal-ph gp6"><span>🌧️</span></div><p>Frente fria atinge a região</p></div>
+        <div class="footer-copy">
+            <div class="container">© 2026 Repórter Serginho Lapada. Todos os direitos reservados.</div>
         </div>
-      </section>
-    </div>
+    </footer>
 
-    <!-- GALERIA DE DESAPARECIDOS -->
-<section class="secao">
-  <div class="secao-header">
-    <h2 class="secao-titulo">🔍 DESAPARECIDOS</h2>
-    <a href="#" class="ver-todas">Ver todos →</a>
-  </div>
-  <div class="desaparecidos-grid">
-    <!-- Os cards serão inseridos aqui via JavaScript -->
-  </div>
-</section>
+    <!-- ===== WHATSAPP FLUTUANTE ===== -->
+    <a href="https://wa.me/5565961197971" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
+            <path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+    </a>
 
-    <!-- SIDEBAR (MAIS LIDAS, ÚLTIMAS ATUALIZAÇÕES, ANÚNCIOS, REDES, FALE CONOSCO) -->
-    <aside class="sidebar">
-      <div class="widget">
-        <h3 class="widget-titulo">🔥 MAIS LIDAS</h3>
-        <ol class="mais-lidas-list">
-          <li><a href="#">Time local vence clássico e assume a liderança do campeonato</a></li>
-          <li><a href="#">Operação policial desarticula quadrilha no Centro e apreende drogas</a></li>
-          <li><a href="#">Seleção convoca jogadores para as próximas Eliminatórias</a></li>
-          <li><a href="#">Preso suspeito de série de assaltos a comércios na zona sul</a></li>
-          <li><a href="#">Prefeitura anuncia pacote de obras em 12 bairros</a></li>
-        </ol>
-      </div>
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // Relógio
+        function atualizarRelogio() {
+            const agora = new Date();
+            const options = {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            };
+            const relogio = document.getElementById('relogio');
+            if (relogio) relogio.textContent = agora.toLocaleDateString('pt-BR', options);
+        }
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
 
-      <div class="widget">
-        <h3 class="widget-titulo">🕐 ÚLTIMAS ATUALIZAÇÕES</h3>
-        <ul class="ultimas-list">
-          <li><span class="upd-time">15:09</span><a href="#">Operação policial prende mais um suspeito no Centro</a></li>
-          <li><span class="upd-time">14:52</span><a href="#">Prefeitura divulga novo cronograma de obras</a></li>
-          <li><span class="upd-time">14:30</span><a href="#">Frente fria: alerta para queda brusca de temperatura</a></li>
-          <li><span class="upd-time">13:47</span><a href="#">Time local se prepara para próximo confronto</a></li>
-          <li><span class="upd-time">12:15</span><a href="#">Avenida Brasil terá bloqueio parcial amanhã</a></li>
-        </ul>
-      </div>
+        // Menu mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const mainNav = document.getElementById('mainNav');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                mainNav.classList.toggle('aberto');
+            });
+        }
 
-      <div class="widget anuncio-box anuncio-300">
-        <div class="anuncio-inner">
-          <span class="anuncio-label">Publicidade</span>
-          <div class="anuncio-content">
-            <span>📢</span>
-            <p>Anuncie aqui!</p>
-            <small>300 × 250</small>
-            <a href="https://wa.me/5565961197971" target="_blank" class="btn-anuncio">Fale conosco</a>
-          </div>
-        </div>
-      </div>
+        // === FUNÇÕES SUPABASE ===
+        async function buscarNoticias(limite = 10) {
+            const { data, error } = await supabaseClient
+                .from('noticias')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(limite);
+            if (error) throw error;
+            return data;
+        }
 
-      <div class="widget">
-        <h3 class="widget-titulo">📱 SIGA NAS REDES</h3>
-        <div class="redes-btns">
-          <a href="#" class="rede-btn rede-fb">📘 Facebook</a>
-          <a href="#" class="rede-btn rede-ig">📸 Instagram</a>
-          <a href="#" class="rede-btn rede-yt">▶️ YouTube</a>
-          <a href="https://wa.me/5565961197971" target="_blank" class="rede-btn rede-wa">💬 WhatsApp</a>
-        </div>
-      </div>
+        async function buscarDesaparecidos() {
+            const { data, error } = await supabaseClient
+                .from('desaparecidos')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            return data;
+        }
 
-      <div class="widget">
-        <h3 class="widget-titulo">📞 FALE CONOSCO</h3>
-        <div class="anuncio-inner" style="padding: 16px; text-align: center;">
-          <p style="margin-bottom: 8px;">Entre em contato com a redação</p>
-          <a href="https://wa.me/5565961197971" target="_blank" class="btn-anuncio">WhatsApp: (65) 9611-9797</a>
-          <p style="margin-top: 12px; font-size: 12px;">email: contato@sergiolapada.com</p>
-        </div>
-      </div>
-    </aside>
-  </main>
+        // === CARREGAR NOTÍCIAS ===
+        async function carregarNoticias() {
+            try {
+                const noticias = await buscarNoticias(10);
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-col">
-        <div class="footer-logo">📰 Repórter Serginho Lapada</div>
-        <p class="footer-sobre">Portal de notícias com cobertura completa de polícia, política, cidades, esportes, entretenimento e utilidade pública. Informação rápida, apurada e com atitude.</p>
-        <p class="footer-whats">📲 WhatsApp da redação: <a href="https://wa.me/5565961197971" target="_blank">+55 65 9611-9797</a></p>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-h4">LINKS RÁPIDOS</h4>
-        <ul class="footer-links">
-          <li><a href="#">Home</a></li><li><a href="#">Últimas notícias</a></li>
-          <li><a href="#">Vídeos</a></li><li><a href="#">Contato</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-h4">INSTITUCIONAL</h4>
-        <ul class="footer-links">
-          <li><a href="#">Sobre o portal</a></li><li><a href="#">Política de Privacidade</a></li>
-          <li><a href="#">Termos de Uso</a></li><li><a href="#">Anuncie aqui</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-copy">
-      <div class="container">© 2026 Repórter Serginho Lapada. Todos os direitos reservados. Feito com paixão por jornadas no local.</div>
-    </div>
-  </footer>
+                if (!noticias || noticias.length === 0) {
+                    document.getElementById('listaNoticias').innerHTML = `
+                        <div style="text-align:center; padding:30px; color:#999;">
+                            📭 Nenhuma notícia cadastrada ainda.
+                        </div>
+                    `;
+                    return;
+                }
 
-  <script src="script.js"></script>
+                // Destaque
+                const destaque = noticias.find(n => n.destaque) || noticias[0];
+                const destaqueContainer = document.getElementById('destaqueNoticia');
+                if (destaqueContainer) {
+                    destaqueContainer.innerHTML = `
+                        <div class="destaque-img" style="${destaque.imagem_url ? `background-image:url('${destaque.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                            ${!destaque.imagem_url ? `<div class="destaque-placeholder"><i class="fas fa-newspaper"></i></div>` : ''}
+                            ${destaque.urgente ? '<span class="badge-urgente">🚨 URGENTE</span>' : ''}
+                        </div>
+                        <div class="destaque-body">
+                            <span class="cat-label cat-${(destaque.categoria || 'geral').toLowerCase()}">${destaque.categoria || 'Geral'}</span>
+                            <h1 class="destaque-title">${destaque.titulo}</h1>
+                            <p class="destaque-resumo">${destaque.resumo}</p>
+                            <div class="meta-row">
+                                <a href="${destaque.link_externo || 'noticia.html?id=' + destaque.id}" ${destaque.link_externo ? 'target="_blank"' : ''} class="btn-leia">Leia mais →</a>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Lista (5 primeiras após o destaque)
+                const noticiasRestantes = noticias.filter(n => n.id !== destaque.id);
+                const listaContainer = document.getElementById('listaNoticias');
+                if (listaContainer) {
+                    if (noticiasRestantes.length === 0) {
+                        listaContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">📭 Mais notícias em breve</div>`;
+                    } else {
+                        listaContainer.innerHTML = noticiasRestantes.slice(0, 5).map(not => `
+                            <article class="card">
+                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                                    ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
+                                    <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h3 class="card-titulo"><a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''}>${not.titulo}</a></h3>
+                                    <p class="card-resumo">${not.resumo}</p>
+                                    <div class="card-meta">
+                                        <a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''} class="btn-leia">Leia mais →</a>
+                                    </div>
+                                </div>
+                            </article>
+                        `).join('');
+                    }
+                }
+
+                // Grid (3 notícias aleatórias da lista)
+                const gridContainer = document.getElementById('gridNoticias');
+                if (gridContainer) {
+                    const gridNoticias = noticias.slice(2, 5);
+                    if (gridNoticias.length === 0) {
+                        gridContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#999; grid-column: 1/-1;">📭 Mais notícias em breve</div>`;
+                    } else {
+                        gridContainer.innerHTML = gridNoticias.map(not => `
+                            <article class="card">
+                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                                    ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
+                                    <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h3 class="card-titulo"><a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''}>${not.titulo}</a></h3>
+                                    <p class="card-resumo">${not.resumo}</p>
+                                    <div class="card-meta">
+                                        <a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''} class="btn-leia">Leia mais →</a>
+                                    </div>
+                                </div>
+                            </article>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('listaNoticias').innerHTML = `
+                    <div style="text-align:center; padding:20px; color:#e74c3c;">
+                        ❌ Erro ao carregar notícias: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // === CARREGAR DESAPARECIDOS ===
+        async function carregarDesaparecidos() {
+            try {
+                const desaparecidos = await buscarDesaparecidos();
+                const container = document.getElementById('listaDesaparecidos');
+                if (!container) return;
+
+                if (!desaparecidos || desaparecidos.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; padding:20px; color:#999; grid-column: 1/-1;">📭 Nenhum desaparecido cadastrado.</div>`;
+                    return;
+                }
+
+                container.innerHTML = desaparecidos.slice(0, 4).map(des => `
+                    <div class="desaparecido-card">
+                        <div class="desaparecido-foto">
+                            <img src="${des.imagem_url || 'https://via.placeholder.com/200'}" 
+                                 alt="${des.nome}" 
+                                 onerror="this.src='https://via.placeholder.com/200'">
+                        </div>
+                        <div class="desaparecido-info">
+                            <h4>${des.nome}</h4>
+                            ${des.idade ? `<span style="font-size:13px; color:#666;">${des.idade} anos</span>` : ''}
+                            ${des.cidade ? `<span style="font-size:13px; color:#666;"> - ${des.cidade}</span>` : ''}
+                            <span class="status ${des.status === 'Localizado' ? 'status-localizado' : 'status-desaparecido'}">${des.status || 'Desaparecido'}</span>
+                            <p>${des.descricao}</p>
+                            ${des.link_externo ? `<a href="${des.link_externo}" target="_blank" class="btn-leia">Leia mais →</a>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar desaparecidos:', error);
+            }
+        }
+
+        // === EXECUÇÃO DIRETA ===
+        carregarNoticias();
+        carregarDesaparecidos();
+    </script>
 </body>
 </html>

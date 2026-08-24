@@ -1,214 +1,663 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo – Serginho Lapada</title>
+    <title>Painel Administrativo - Serginho Lapada</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; color: #333; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h1, h2 { font-family: Georgia, serif; color: #1a1a1a; }
-        h1 { text-align: center; color: #e63946; margin-bottom: 20px; }
-        h2 { margin: 25px 0 12px; border-bottom: 2px solid #e63946; padding-bottom: 8px; }
-        .form-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-        .form-group input, .form-group textarea, .form-group select { flex: 1; min-width: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        .form-group textarea { min-height: 80px; }
-        button { background: #e63946; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #c1121f; }
-        .list-item { background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .list-item strong { display: block; font-size: 16px; }
-        .list-item small { color: #777; }
-        .btn-excluir { background: #dc3545; }
-        .btn-exportar, .btn-importar { background: #007bff; }
-        .acoes { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        .galeria-list { display: flex; flex-wrap: wrap; gap: 15px; }
-        .galeria-item { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 10px; text-align: center; width: 180px; }
-        .galeria-item img { width: 100%; height: auto; border-radius: 6px; }
-        .galeria-item p { font-size: 12px; color: #555; margin-top: 6px; }
-        .galeria-item button { margin-top: 6px; background: #dc3545; }
+        :root {
+            --vermelho: #E10600;
+            --preto: #0B0B0B;
+            --branco: #FFFFFF;
+            --cinza: #F4F4F4;
+            --cinza-escuro: #666666;
+            --sombra: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            color: var(--preto);
+        }
+        .admin-container { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: 250px;
+            background: var(--preto);
+            color: var(--branco);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        .admin-logo { display: flex; align-items: center; margin-bottom: 30px; }
+        .admin-logo h2 { font-size: 1.25rem; letter-spacing: 0.5px; font-weight: 700; }
+        .admin-nav a {
+            display: block;
+            padding: 12px 16px;
+            color: #aaa;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+        }
+        .admin-nav a:hover { background: rgba(255,255,255,0.05); color: var(--branco); }
+        .admin-nav a.active { background: var(--vermelho); color: var(--branco); }
+        .btn-logout {
+            background: transparent;
+            color: #dc3545;
+            border: 1.5px solid #dc3545;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: auto;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover { background: #dc3545; color: var(--branco); }
+        .admin-main { flex: 1; padding: 30px; overflow-y: auto; }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .admin-header h1 { font-size: 1.8rem; }
+        .admin-user { color: var(--cinza-escuro); font-size: 14px; }
+        .pagina-admin { display: none; }
+        .pagina-admin.ativa { display: block; }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .dash-card {
+            background: var(--branco);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--sombra);
+            text-align: center;
+        }
+        .dash-numero { font-size: 2.8rem; font-weight: 900; color: var(--vermelho); }
+        .dash-label { color: var(--cinza-escuro); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: var(--vermelho); outline: none; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .btn-primary {
+            background: var(--vermelho);
+            color: var(--branco);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover { background: var(--preto); transform: scale(1.02); }
+        .btn-secundario {
+            background: var(--cinza-escuro);
+            color: var(--branco);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-excluir {
+            background: transparent;
+            color: #dc3545;
+            border: 1.5px solid #dc3545;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-excluir:hover { background: #dc3545; color: #fff; }
+        .btn-editar {
+            background: transparent;
+            color: #007bff;
+            border: 1.5px solid #007bff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-editar:hover { background: #007bff; color: #fff; }
+        .item-admin {
+            background: var(--branco);
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            box-shadow: var(--sombra);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .item-admin .info { flex: 1; }
+        .item-admin .info h4 { font-size: 1rem; margin-bottom: 4px; }
+        .item-admin .info p { color: var(--cinza-escuro); font-size: 14px; }
+        .item-admin .info small { color: #999; font-size: 12px; }
+        .item-admin .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .status-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .status-desaparecido { background: #e74c3c; color: #fff; }
+        .status-localizado { background: #27ae60; color: #fff; }
+        .badge-destaque { background: var(--vermelho); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 700; }
+        .form-checkbox { display: flex; gap: 20px; margin: 10px 0; flex-wrap: wrap; }
+        .form-checkbox label { display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; }
+        #formNoticiaContainer,
+        #formDesaparecidoContainer {
+            background: var(--branco);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--sombra);
+            display: none;
+        }
+        #avisoGlobal {
+            display: none;
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .admin-container { flex-direction: column; }
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 15px;
+                align-items: center;
+            }
+            .admin-logo { margin-bottom: 0; }
+            .admin-nav { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+            .admin-nav a { padding: 8px 12px; font-size: 13px; margin-bottom: 0; }
+            .btn-logout { margin-top: 0; padding: 8px 16px; }
+            .admin-main { padding: 15px; }
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+            .item-admin { flex-direction: column; align-items: stretch; }
+            .item-admin .acoes { justify-content: flex-end; }
+        }
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .admin-sidebar { flex-direction: column; align-items: stretch; }
+            .admin-nav { flex-direction: column; }
+        }
+        .loading { text-align: center; padding: 20px; color: #999; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📰 PAINEL LAPADA NEWS</h1>
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <h2>Lapada News</h2>
+            </div>
+            <nav class="admin-nav">
+                <a class="active" data-pagina="dashboard">Dashboard</a>
+                <a data-pagina="noticias">Notícias</a>
+                <a data-pagina="desaparecidos">Desaparecidos</a>
+            </nav>
+            <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+        </aside>
 
-        <h2>➕ Nova Notícia</h2>
-        <div class="form-group">
-            <input id="notTitulo" placeholder="Título da notícia">
-            <select id="notCategoria">
-                <option value="Polícia">Polícia</option>
-                <option value="Política">Política</option>
-                <option value="Cidades">Cidades</option>
-                <option value="Esportes">Esportes</option>
-                <option value="Entretenimento">Entretenimento</option>
-                <option value="Comunidade">Comunidade</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <textarea id="notResumo" placeholder="Resumo da notícia"></textarea>
-        </div>
-        <div class="form-group">
-            <input id="notAutor" placeholder="Autor (ex: Serginho Lapada)">
-            <input id="notTempo" placeholder="Tempo (ex: há 35 min)">
-        </div>
-        <button onclick="adicionarNoticia()">Salvar Notícia</button>
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 id="tituloPagina">Dashboard</h1>
+                <div class="admin-user" id="userEmail">admin@email.com</div>
+            </header>
 
-        <h2>🖼️ Nova Imagem na Galeria de Desaparecidos</h2>
-        <div class="form-group">
-            <input id="desNome" placeholder="Nome da pessoa">
-            <input id="desFoto" placeholder="URL da foto (ou use emoji)">
-        </div>
-        <div class="form-group">
-            <textarea id="desDesc" placeholder="Descrição, cidade, contato..."></textarea>
-        </div>
-        <button onclick="adicionarDesaparecido()">Salvar Desaparecido</button>
+            <div id="avisoGlobal"></div>
 
-        <h2>📋 Notícias Cadastradas</h2>
-        <div id="listaNoticias"></div>
+            <div id="conteudoAdmin">
+                <div id="pagina-dashboard" class="pagina-admin ativa">
+                    <div class="dashboard-grid" id="dashboardCards">
+                        <div class="dash-card">
+                            <div class="dash-numero" id="totalNoticias">0</div>
+                            <div class="dash-label">Total de Notícias</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-numero" id="totalDesaparecidos">0</div>
+                            <div class="dash-label">Desaparecidos</div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-numero" id="noticiasHoje">0</div>
+                            <div class="dash-label">Notícias Hoje</div>
+                        </div>
+                    </div>
+                    <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:var(--sombra);">
+                        <h3>Últimas Notícias</h3>
+                        <div id="ultimasNoticiasAdmin"><div class="loading">Carregando...</div></div>
+                    </div>
+                </div>
 
-        <h2>🔍 Desaparecidos Cadastrados</h2>
-        <div class="galeria-list" id="listaDesaparecidos"></div>
+                <div id="pagina-noticias" class="pagina-admin">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                        <h2>Gerenciar Notícias</h2>
+                        <button onclick="abrirFormNoticia()" class="btn-primary">Nova Notícia</button>
+                    </div>
 
-        <div class="acoes">
-            <button class="btn-exportar" onclick="exportarDados()">📤 Exportar Dados</button>
-            <button class="btn-importar" onclick="importarDados()">📥 Importar Dados</button>
-        </div>
+                    <div id="formNoticiaContainer">
+                        <h3 id="formNoticiaTitulo">Nova Notícia</h3>
+                        <form id="formNoticia" onsubmit="salvarNoticia(event)">
+                            <input type="hidden" id="noticiaId">
+                            <div class="form-group">
+                                <label>Título *</label>
+                                <input type="text" id="notTitulo" required placeholder="Título da notícia">
+                            </div>
+                            <div class="form-group">
+                                <label>Categoria *</label>
+                                <select id="notCategoria" required>
+                                    <option value="Polícia">Polícia</option>
+                                    <option value="Política">Política</option>
+                                    <option value="Cidades">Cidades</option>
+                                    <option value="Esportes">Esportes</option>
+                                    <option value="Comunidade">Comunidade</option>
+                                    <option value="Entretenimento">Entretenimento</option>
+                                    <option value="Geral">Geral</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Resumo *</label>
+                                <textarea id="notResumo" required placeholder="Resumo da notícia"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Link da Imagem (URL)</label>
+                                <input type="text" id="notImagem" placeholder="https://exemplo.com/foto.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Link Externo (opcional)</label>
+                                <input type="text" id="notLink" placeholder="https://... (deixe vazio para usar a página interna)">
+                            </div>
+                            <div class="form-group">
+                                <label>Autor</label>
+                                <input type="text" id="notAutor" placeholder="Serginho Lapada">
+                            </div>
+                            <div class="form-group">
+                                <label>Tempo</label>
+                                <input type="text" id="notTempo" placeholder="há 5 minutos">
+                            </div>
+                            <div class="form-checkbox">
+                                <label><input type="checkbox" id="notDestaque"> Destaque</label>
+                                <label><input type="checkbox" id="notUrgente"> Urgente</label>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button type="submit" class="btn-primary">Salvar</button>
+                                <button type="button" onclick="fecharFormNoticia()" class="btn-secundario">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="listaNoticiasAdmin"><div class="loading">Carregando notícias...</div></div>
+                </div>
+
+                <div id="pagina-desaparecidos" class="pagina-admin">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                        <h2>Gerenciar Desaparecidos</h2>
+                        <button onclick="abrirFormDesaparecido()" class="btn-primary">Nova Pessoa</button>
+                    </div>
+
+                    <div id="formDesaparecidoContainer">
+                        <h3 id="formDesaparecidoTitulo">Novo Desaparecido</h3>
+                        <form id="formDesaparecido" onsubmit="salvarDesaparecido(event)">
+                            <input type="hidden" id="desaparecidoId">
+                            <div class="form-group">
+                                <label>Nome *</label>
+                                <input type="text" id="desNome" required placeholder="Nome completo">
+                            </div>
+                            <div class="form-group">
+                                <label>Idade</label>
+                                <input type="number" id="desIdade" placeholder="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Cidade</label>
+                                <input type="text" id="desCidade" placeholder="Cidade/Região">
+                            </div>
+                            <div class="form-group">
+                                <label>Link da Foto (URL)</label>
+                                <input type="text" id="desImagem" placeholder="https://exemplo.com/foto.jpg">
+                            </div>
+                            <div class="form-group">
+                                 <label>Link Externo (opcional)</label>
+                                 <input type="text" id="desLink" placeholder="https://... (rede social, outra notícia, etc)">
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição *</label>
+                                <textarea id="desDesc" required placeholder="Descrição, características, contato..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="desStatus">
+                                    <option value="Desaparecido">Desaparecido</option>
+                                    <option value="Localizado">Localizado</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <button type="submit" class="btn-primary">Salvar</button>
+                                <button type="button" onclick="fecharFormDesaparecido()" class="btn-secundario">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="listaDesaparecidosAdmin"><div class="loading">Carregando desaparecidos...</div></div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Funções para manipular localStorage
-        const STORAGE_KEY_NOTICIAS = 'lapada_noticias';
-        const STORAGE_KEY_DESAPARECIDOS = 'lapada_desaparecidos';
-
-        function obterNoticias() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY_NOTICIAS) || '[]');
+        const avisoGlobal = document.getElementById('avisoGlobal');
+        function mostrarAviso(texto) {
+            avisoGlobal.style.display = 'block';
+            avisoGlobal.textContent = texto;
         }
 
-        function obterDesaparecidos() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY_DESAPARECIDOS) || '[]');
-        }
-
-        function salvarNoticias(lista) {
-            localStorage.setItem(STORAGE_KEY_NOTICIAS, JSON.stringify(lista));
-            renderizarNoticias();
-        }
-
-        function salvarDesaparecidos(lista) {
-            localStorage.setItem(STORAGE_KEY_DESAPARECIDOS, JSON.stringify(lista));
-            renderizarDesaparecidos();
-        }
-
-        function adicionarNoticia() {
-            const titulo = document.getElementById('notTitulo').value.trim();
-            const categoria = document.getElementById('notCategoria').value;
-            const resumo = document.getElementById('notResumo').value.trim();
-            const autor = document.getElementById('notAutor').value.trim() || 'Serginho Lapada';
-            const tempo = document.getElementById('notTempo').value.trim() || 'agora';
-            if (!titulo || !resumo) { alert('Preencha título e resumo'); return; }
-            const noticias = obterNoticias();
-            noticias.push({ titulo, categoria, resumo, autor, tempo, id: Date.now() });
-            salvarNoticias(noticias);
-            limparFormNoticia();
-        }
-
-        function adicionarDesaparecido() {
-            const nome = document.getElementById('desNome').value.trim();
-            const foto = document.getElementById('desFoto').value.trim() || '👤';
-            const descricao = document.getElementById('desDesc').value.trim();
-            if (!nome || !descricao) { alert('Preencha nome e descrição'); return; }
-            const desaparecidos = obterDesaparecidos();
-            desaparecidos.push({ nome, foto, descricao, id: Date.now() });
-            salvarDesaparecidos(desaparecidos);
-            limparFormDesaparecido();
-        }
-
-        function renderizarNoticias() {
-            const lista = obterNoticias();
-            const container = document.getElementById('listaNoticias');
-            if (lista.length === 0) {
-                container.innerHTML = '<p>Nenhuma notícia cadastrada.</p>';
-                return;
-            }
-            container.innerHTML = lista.map(not => `
-                <div class="list-item">
-                    <div>
-                        <strong>${not.titulo}</strong>
-                        <small>${not.categoria} | ${not.autor} | ${not.tempo}</small>
-                        <p>${not.resumo}</p>
-                    </div>
-                    <button class="btn-excluir" onclick="excluirNoticia(${not.id})">Excluir</button>
-                </div>
-            `).join('');
-        }
-
-        function renderizarDesaparecidos() {
-            const lista = obterDesaparecidos();
-            const container = document.getElementById('listaDesaparecidos');
-            if (lista.length === 0) {
-                container.innerHTML = '<p>Nenhum desaparecido cadastrado.</p>';
-                return;
-            }
-            container.innerHTML = lista.map(des => `
-                <div class="galeria-item">
-                    <img src="${des.foto}" alt="${des.nome}" onerror="this.src='https://via.placeholder.com/150'">
-                    <p><strong>${des.nome}</strong></p>
-                    <p>${des.descricao}</p>
-                    <button class="btn-excluir" onclick="excluirDesaparecido(${des.id})">Excluir</button>
-                </div>
-            `).join('');
-        }
-
-        function excluirNoticia(id) {
-            if (confirm('Excluir esta notícia?')) {
-                salvarNoticias(obterNoticias().filter(n => n.id !== id));
+        async function verificarAdmin() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user && user.email) {
+                    document.getElementById('userEmail').textContent = user.email;
+                }
+                carregarDashboard();
+                carregarNoticiasAdmin();
+                carregarDesaparecidosAdmin();
+            } catch (e) {
+                mostrarAviso('Erro ao verificar login: ' + e.message);
             }
         }
 
-        function excluirDesaparecido(id) {
-            if (confirm('Excluir este desaparecido?')) {
-                salvarDesaparecidos(obterDesaparecidos().filter(d => d.id !== id));
+        document.querySelectorAll('.admin-nav a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.admin-nav a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                const pagina = this.dataset.pagina;
+                document.querySelectorAll('.pagina-admin').forEach(p => p.classList.remove('ativa'));
+                document.getElementById(`pagina-${pagina}`).classList.add('ativa');
+                const titulos = {
+                    dashboard: 'Dashboard',
+                    noticias: 'Gerenciar Notícias',
+                    desaparecidos: 'Gerenciar Desaparecidos'
+                };
+                document.getElementById('tituloPagina').textContent = titulos[pagina];
+                if (pagina === 'noticias') carregarNoticiasAdmin();
+                if (pagina === 'desaparecidos') carregarDesaparecidosAdmin();
+            });
+        });
+
+        async function carregarDashboard() {
+            try {
+                const { data: noticias, error: erroNoticias } = await supabaseClient.from('noticias').select('*');
+                const { data: desaparecidos, error: erroDes } = await supabaseClient.from('desaparecidos').select('*');
+                if (erroNoticias || erroDes) {
+                    mostrarAviso('Erro ao buscar dados: ' + ((erroNoticias || erroDes).message));
+                    return;
+                }
+                document.getElementById('totalNoticias').textContent = noticias?.length || 0;
+                document.getElementById('totalDesaparecidos').textContent = desaparecidos?.length || 0;
+                const hoje = new Date().toDateString();
+                const noticiasHoje = noticias?.filter(n => new Date(n.created_at).toDateString() === hoje) || [];
+                document.getElementById('noticiasHoje').textContent = noticiasHoje.length;
+
+                const ultimas = noticias?.slice(0, 5) || [];
+                const container = document.getElementById('ultimasNoticiasAdmin');
+                if (ultimas.length === 0) {
+                    container.innerHTML = '<p style="color:#999;">Nenhuma notícia cadastrada.</p>';
+                } else {
+                    container.innerHTML = ultimas.map(not => `
+                        <div style="padding:10px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <div><strong>${not.titulo}</strong><br><small style="color:#999;">${not.categoria || 'Geral'}</small></div>
+                            <span style="color:#666; font-size:14px;">${new Date(not.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                mostrarAviso('Erro no dashboard: ' + e.message);
             }
         }
 
-        function limparFormNoticia() {
-            ['notTitulo','notResumo','notAutor','notTempo'].forEach(id => document.getElementById(id).value = '');
+        function abrirFormNoticia(dados = null) {
+            const container = document.getElementById('formNoticiaContainer');
+            container.style.display = 'block';
+            if (dados) {
+                document.getElementById('formNoticiaTitulo').textContent = 'Editar Notícia';
+                document.getElementById('noticiaId').value = dados.id;
+                document.getElementById('notTitulo').value = dados.titulo || '';
+                document.getElementById('notCategoria').value = dados.categoria || 'Geral';
+                document.getElementById('notResumo').value = dados.resumo || '';
+                document.getElementById('notImagem').value = dados.imagem_url || '';
+                document.getElementById('notLink').value = dados.link_externo || '';
+                document.getElementById('notAutor').value = dados.autor || '';
+                document.getElementById('notTempo').value = dados.Tempo || '';
+                document.getElementById('notDestaque').checked = dados.destaque || false;
+                document.getElementById('notUrgente').checked = dados.urgente || false;
+            } else {
+                document.getElementById('formNoticiaTitulo').textContent = 'Nova Notícia';
+                document.getElementById('formNoticia').reset();
+                document.getElementById('noticiaId').value = '';
+            }
         }
 
-        function limparFormDesaparecido() {
-            ['desNome','desFoto','desDesc'].forEach(id => document.getElementById(id).value = '');
+        function fecharFormNoticia() {
+            document.getElementById('formNoticiaContainer').style.display = 'none';
         }
 
-        function exportarDados() {
+        async function salvarNoticia(e) {
+            e.preventDefault();
             const dados = {
-                noticias: obterNoticias(),
-                desaparecidos: obterDesaparecidos()
+                titulo: document.getElementById('notTitulo').value.trim(),
+                categoria: document.getElementById('notCategoria').value,
+                resumo: document.getElementById('notResumo').value.trim(),
+                imagem_url: document.getElementById('notImagem').value.trim() || null,
+                link_externo: document.getElementById('notLink').value.trim() || null,
+                autor: document.getElementById('notAutor').value.trim() || 'Serginho Lapada',
+                Tempo: document.getElementById('notTempo').value.trim() || 'agora',
+                destaque: document.getElementById('notDestaque').checked,
+                urgente: document.getElementById('notUrgente').checked,
+                status: 'publicado'
             };
-            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'lapada_dados.json';
-            a.click();
+            try {
+                const id = document.getElementById('noticiaId').value;
+                let resultado;
+                if (id) {
+                    resultado = await supabaseClient.from('noticias').update(dados).eq('id', id);
+                } else {
+                    resultado = await supabaseClient.from('noticias').insert([dados]);
+                }
+                if (resultado.error) {
+                    alert('Erro: ' + resultado.error.message);
+                    return;
+                }
+                alert(id ? 'Notícia atualizada!' : 'Notícia criada!');
+                fecharFormNoticia();
+                carregarNoticiasAdmin();
+                carregarDashboard();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
         }
 
-        function importarDados() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                const text = await file.text();
-                const dados = JSON.parse(text);
-                if (dados.noticias) salvarNoticias(dados.noticias);
-                if (dados.desaparecidos) salvarDesaparecidos(dados.desaparecidos);
-                alert('Dados importados!');
-            };
-            input.click();
+        async function carregarNoticiasAdmin() {
+            const container = document.getElementById('listaNoticiasAdmin');
+            container.innerHTML = '<div class="loading">Carregando...</div>';
+            try {
+                const { data, error } = await supabaseClient.from('noticias').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    container.innerHTML = '<p style="color:#c00;">Erro ao carregar: ' + error.message + '</p>';
+                    return;
+                }
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color:#999;">Nenhuma notícia cadastrada.</p>';
+                    return;
+                }
+                container.innerHTML = data.map(not => `
+                    <div class="item-admin">
+                        <div class="info">
+                            <h4>${not.titulo}</h4>
+                            <p>${not.resumo}</p>
+                            <small>${not.categoria || 'Geral'} • ${new Date(not.created_at).toLocaleDateString('pt-BR')}</small>
+                            ${not.destaque ? ' <span class="badge-destaque">Destaque</span>' : ''}
+                        </div>
+                        <div class="acoes">
+                            <button onclick='abrirFormNoticia(${JSON.stringify(not)})' class="btn-editar">Editar</button>
+                            <button onclick="excluirNoticiaAdmin('${not.id}')" class="btn-excluir">Excluir</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = '<p style="color:#c00;">Erro inesperado: ' + e.message + '</p>';
+            }
         }
 
-        // Renderizar inicial
-        renderizarNoticias();
-        renderizarDesaparecidos();
+        async function excluirNoticiaAdmin(id) {
+            if (!confirm('Excluir esta notícia?')) return;
+            const { error } = await supabaseClient.from('noticias').delete().eq('id', id);
+            if (error) { alert('Erro: ' + error.message); return; }
+            carregarNoticiasAdmin();
+            carregarDashboard();
+        }
+
+        function abrirFormDesaparecido(dados = null) {
+            const container = document.getElementById('formDesaparecidoContainer');
+            container.style.display = 'block';
+            if (dados) {
+                document.getElementById('desLink').value = dados.link_externo || '';
+                document.getElementById('formDesaparecidoTitulo').textContent = 'Editar Desaparecido';
+                document.getElementById('desaparecidoId').value = dados.id;
+                document.getElementById('desNome').value = dados.nome || '';
+                document.getElementById('desIdade').value = dados.idade || '';
+                document.getElementById('desCidade').value = dados.cidade || '';
+                document.getElementById('desImagem').value = dados.imagem_url || '';
+                document.getElementById('desDesc').value = dados.descricao || '';
+                document.getElementById('desStatus').value = dados.status || 'Desaparecido';
+            } else {
+                document.getElementById('formDesaparecidoTitulo').textContent = 'Novo Desaparecido';
+                document.getElementById('formDesaparecido').reset();
+                document.getElementById('desaparecidoId').value = '';
+            }
+        }
+
+        function fecharFormDesaparecido() {
+            document.getElementById('formDesaparecidoContainer').style.display = 'none';
+        }
+
+        async function salvarDesaparecido(e) {
+            e.preventDefault();
+            const dados = {
+                nome: document.getElementById('desNome').value.trim(),
+                idade: parseInt(document.getElementById('desIdade').value) || null,
+                cidade: document.getElementById('desCidade').value.trim(),
+                imagem_url: document.getElementById('desImagem').value.trim() || null,
+                descricao: document.getElementById('desDesc').value.trim(),
+                status: document.getElementById('desStatus').value,
+                link_externo: document.getElementById('desLink').value.trim() || null,
+            };
+            try {
+                const id = document.getElementById('desaparecidoId').value;
+                let resultado;
+                if (id) {
+                    resultado = await supabaseClient.from('desaparecidos').update(dados).eq('id', id);
+                } else {
+                    resultado = await supabaseClient.from('desaparecidos').insert([dados]);
+                }
+                if (resultado.error) {
+                    alert('Erro: ' + resultado.error.message);
+                    return;
+                }
+                alert(id ? 'Desaparecido atualizado!' : 'Desaparecido criado!');
+                fecharFormDesaparecido();
+                carregarDesaparecidosAdmin();
+                carregarDashboard();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarDesaparecidosAdmin() {
+            const container = document.getElementById('listaDesaparecidosAdmin');
+            container.innerHTML = '<div class="loading">Carregando...</div>';
+            try {
+                const { data, error } = await supabaseClient.from('desaparecidos').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    container.innerHTML = '<p style="color:#c00;">Erro ao carregar: ' + error.message + '</p>';
+                    return;
+                }
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color:#999;">Nenhum desaparecido cadastrado.</p>';
+                    return;
+                }
+                container.innerHTML = data.map(des => `
+                    <div class="item-admin">
+                        <div class="info">
+                            <h4>${des.nome} ${des.idade ? '('+des.idade+' anos)' : ''}</h4>
+                            <p>${des.descricao}</p>
+                            <small>${des.cidade || 'Cidade não informada'} • 
+                                <span class="status-badge ${des.status === 'Localizado' ? 'status-localizado' : 'status-desaparecido'}">${des.status || 'Desaparecido'}</span>
+                            </small>
+                        </div>
+                        <div class="acoes">
+                            <button onclick='abrirFormDesaparecido(${JSON.stringify(des)})' class="btn-editar">Editar</button>
+                            <button onclick="excluirDesaparecidoAdmin('${des.id}')" class="btn-excluir">Excluir</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = '<p style="color:#c00;">Erro inesperado: ' + e.message + '</p>';
+            }
+        }
+
+        async function excluirDesaparecidoAdmin(id) {
+            if (!confirm('Excluir este desaparecido?')) return;
+            const { error } = await supabaseClient.from('desaparecidos').delete().eq('id', id);
+            if (error) { alert('Erro: ' + error.message); return; }
+            carregarDesaparecidosAdmin();
+            carregarDashboard();
+        }
+
+        async function fazerLogout() {
+            if (!confirm('Sair?')) return;
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        verificarAdmin();
     </script>
 </body>
 </html>
