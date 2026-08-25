@@ -14,120 +14,385 @@
      gtag('js', new Date());
      gtag('config', 'G-15477657576');
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #0B0B0B;
+            --ink-soft: #2b2b2b;
+            --paper: #F7F3EA;
+            --paper-dim: #ece6d6;
+            --red: #E10600;
+            --red-deep: #a10400;
+            --line: rgba(11,11,11,0.12);
+            --success: #1c6e35;
+            --success-bg: #e5f2e9;
+            --error: #a10400;
+            --error-bg: #fbe4e2;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { color-scheme: light; }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #1a1a2e;
-            padding: 20px;
+            padding: 24px;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 15% -10%, #23233a 0%, transparent 60%),
+                radial-gradient(1000px 500px at 110% 110%, #23233a 0%, transparent 55%),
+                #101018;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Faint moving newsprint texture, purely ambient */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -10%;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+            animation: drift 22s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes drift {
+            0% { transform: translate3d(0,0,0); }
+            100% { transform: translate3d(0,-3%,0); }
+        }
+
+        .masthead {
+            position: relative;
+            text-align: center;
+            margin-bottom: 22px;
+            opacity: 0;
+            animation: fadeDown .7s var(--ease) .05s forwards;
+        }
+
+        .masthead .kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #cfcfe0;
+            margin-bottom: 6px;
+        }
+
+        .masthead .kicker::before,
+        .masthead .kicker::after {
+            content: "";
+            width: 22px;
+            height: 1px;
+            background: rgba(207,207,224,0.4);
+        }
+
+        .masthead .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 0 0 rgba(225,6,0,0.55);
+            animation: pulse 2.2s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(225,6,0,0.55); }
+            70%  { box-shadow: 0 0 0 8px rgba(225,6,0,0); }
+            100% { box-shadow: 0 0 0 0 rgba(225,6,0,0); }
+        }
+
+        .masthead h1 {
+            font-family: 'Fraunces', serif;
+            font-weight: 900;
+            font-size: clamp(28px, 4vw, 34px);
+            color: #fff;
+            letter-spacing: -0.01em;
         }
 
         .login-box {
-            background: #fff;
-            border-radius: 12px;
-            padding: 40px;
+            background: var(--paper);
+            border-radius: 4px;
+            padding: 44px 40px 36px;
             max-width: 400px;
             width: 100%;
-            text-align: center;
+            position: relative;
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.5) inset,
+                0 30px 60px -20px rgba(0,0,0,0.55),
+                0 10px 25px -10px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(24px) rotate(-0.6deg);
+            animation: settle .75s var(--ease) .15s forwards;
         }
 
-        .login-box h1 {
-            color: #E10600;
-            margin-bottom: 10px;
+        /* torn / deckled top edge, newspaper feel */
+        .login-box::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--paper);
+            clip-path: polygon(0% 100%, 2% 30%, 5% 90%, 9% 20%, 13% 80%, 17% 10%, 21% 70%, 25% 25%, 29% 85%, 33% 15%, 37% 75%, 41% 30%, 45% 90%, 49% 20%, 53% 80%, 57% 10%, 61% 70%, 65% 25%, 69% 85%, 73% 15%, 77% 75%, 81% 30%, 85% 90%, 89% 20%, 93% 80%, 97% 10%, 100% 100%);
         }
 
-        .login-box p {
-            color: #666;
-            margin-bottom: 30px;
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .login-box input {
+        @keyframes settle {
+            from { opacity: 0; transform: translateY(24px) rotate(-0.6deg); }
+            to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--red);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .login-box h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .login-box .sub {
+            color: #6b6b6b;
+            font-size: 13.5px;
+            margin-bottom: 28px;
+        }
+
+        .field {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .field input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        .login-box input:focus {
-            border-color: #E10600;
+            padding: 16px 14px 8px;
+            border: none;
+            border-bottom: 1.5px solid var(--line);
+            background: transparent;
+            font-size: 15.5px;
+            font-family: 'Inter', Arial, sans-serif;
+            color: var(--ink);
             outline: none;
+            transition: border-color .25s var(--ease);
         }
 
-        .login-box button {
+        .field label {
+            position: absolute;
+            left: 14px;
+            top: 16px;
+            font-size: 15.5px;
+            color: #8a8a8a;
+            pointer-events: none;
+            transform-origin: left top;
+            transition: transform .2s var(--ease), color .2s var(--ease), top .2s var(--ease);
+        }
+
+        .field input:focus + label,
+        .field input:not(:placeholder-shown) + label {
+            transform: translateY(-9px) scale(0.76);
+            color: var(--red);
+        }
+
+        .field::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -1.5px;
+            height: 2px;
+            width: 0%;
+            background: var(--red);
+            transition: width .3s var(--ease);
+        }
+
+        .field:focus-within::after { width: 100%; }
+
+        .field input:focus { border-color: transparent; }
+
+        button#btn-login {
             width: 100%;
-            padding: 14px;
-            background: #E10600;
+            padding: 15px;
+            margin-top: 8px;
+            background: var(--ink);
             color: #fff;
             border: none;
-            border-radius: 8px;
-            font-size: 18px;
+            border-radius: 3px;
+            font-size: 15px;
             font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background 0.2s, opacity 0.2s;
+            position: relative;
+            overflow: hidden;
+            transition: transform .15s var(--ease), box-shadow .25s var(--ease);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .login-box button:hover {
-            background: #0B0B0B;
+        button#btn-login::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--red);
+            transform: translateX(-101%);
+            transition: transform .35s var(--ease);
+            z-index: 0;
         }
 
-        .login-box button:disabled {
-            opacity: 0.7;
+        button#btn-login span { position: relative; z-index: 1; }
+
+        button#btn-login:hover::before { transform: translateX(0); }
+
+        button#btn-login:active {
+            transform: scale(0.98);
+        }
+
+        button#btn-login:disabled {
             cursor: not-allowed;
+            opacity: 0.85;
         }
+
+        .spinner {
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            display: none;
+            position: relative;
+            z-index: 1;
+            animation: spin .7s linear infinite;
+        }
+
+        button#btn-login.loading .spinner { display: inline-block; }
+        button#btn-login.loading .btn-text { opacity: 0.85; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         #msg {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            display: none;
-            font-size: 14px;
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 3px;
+            font-size: 13.5px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(-4px);
+            transition: max-height .35s var(--ease), opacity .3s var(--ease), transform .3s var(--ease), padding .35s var(--ease), margin .35s var(--ease);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #msg.show {
+            max-height: 80px;
+            opacity: 1;
+            transform: translateY(0);
         }
 
         #msg.erro {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
+            background: var(--error-bg);
+            color: var(--error);
+            animation: shake .4s var(--ease);
         }
 
         #msg.sucesso {
-            background: #d4edda;
-            color: #155724;
-            display: block;
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .footnote {
+            margin-top: 26px;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a8a8a8;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>📰 Lapada News</h1>
-        <p>Painel Administrativo</p>
+    <div>
+        <div class="masthead">
+            <div class="kicker"><span class="dot"></span>Painel administrativo</div>
+            <h1>Lapada News</h1>
+        </div>
 
-        <form id="login-form" autocomplete="on">
-            <input 
-                type="email" 
-                id="email" 
-                placeholder="Email" 
-                autocomplete="email"
-                required
-            >
-            <input 
-                type="password" 
-                id="senha" 
-                placeholder="Senha" 
-                autocomplete="current-password"
-                required
-            >
-            <button type="submit" id="btn-login">Entrar</button>
-        </form>
+        <div class="login-box">
+            <div class="eyebrow">Acesso restrito</div>
+            <h2>Entrar na redação</h2>
+            <p class="sub">Use suas credenciais para acessar o painel.</p>
 
-        <div id="msg"></div>
+            <form id="login-form" autocomplete="on">
+                <div class="field">
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder=" "
+                        autocomplete="email"
+                        required
+                    >
+                    <label for="email">Email</label>
+                </div>
+
+                <div class="field">
+                    <input
+                        type="password"
+                        id="senha"
+                        placeholder=" "
+                        autocomplete="current-password"
+                        required
+                    >
+                    <label for="senha">Senha</label>
+                </div>
+
+                <button type="submit" id="btn-login">
+                    <span class="btn-text">Entrar</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+
+            <div id="msg"></div>
+        </div>
+
+        <div class="footnote">Lapada News &middot; Sistema interno</div>
     </div>
 
     <script>
@@ -135,10 +400,19 @@
         const btnLogin = document.getElementById('btn-login');
         const msgDiv = document.getElementById('msg');
 
+        function showMsg(text, type) {
+            msgDiv.textContent = text;
+            msgDiv.className = type;
+            // force reflow so the transition replays even if same class as before
+            void msgDiv.offsetWidth;
+            msgDiv.classList.add('show');
+        }
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             btnLogin.disabled = true;
-            msgDiv.style.display = 'none';
+            btnLogin.classList.add('loading');
+            msgDiv.classList.remove('show');
 
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
@@ -150,19 +424,15 @@
                     throw error;
                 }
 
-                msgDiv.textContent = 'Login bem-sucedido! Redirecionando...';
-                msgDiv.className = 'sucesso';
-                msgDiv.style.display = 'block';
+                showMsg('Login bem-sucedido! Redirecionando...', 'sucesso');
 
                 setTimeout(() => {
                     window.location.href = 'admin.html';
                 }, 1500);
             } catch (err) {
-                msgDiv.textContent = 'Erro ao fazer login: ' + err.message;
-                msgDiv.className = 'erro';
-                msgDiv.style.display = 'block';
-            } finally {
+                showMsg('Erro ao fazer login: ' + err.message, 'erro');
                 btnLogin.disabled = false;
+                btnLogin.classList.remove('loading');
             }
         });
     </script>

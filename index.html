@@ -205,6 +205,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-size: contain !important;   /* ← imagem inteira sem corte */
+            background-repeat: no-repeat !important;
+            background-position: center !important;
         }
         .destaque-placeholder {
             font-size: 4rem;
@@ -348,6 +351,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-size: contain !important;   /* ← imagem inteira sem corte */
+            background-repeat: no-repeat !important;
+            background-position: center !important;
         }
         .card-img-ph {
             font-size: 3rem;
@@ -626,6 +632,254 @@
             background: rgba(255,255,255,0.15);
             transform: scale(1.1);
         }
+        .destaque-img {
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-color: #1a1a2e; /* cor de fundo para as bordas */
+}
+.destaque-img {
+    position: relative;
+    height: 350px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+.card-img-wrap {
+    position: relative;
+    height: 180px;
+    background: linear-gradient(135deg, #2d2d3f, #1a1a2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+.desaparecido-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;  /* em vez de cover */
+}
+/* ============================================
+   📸 DESTAQUE - IMAGEM PRINCIPAL
+   ============================================ */
+.destaque-img {
+    position: relative;
+    height: 350px;
+    background-color: #0B0B0B;          /* fundo escuro */
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+}
+
+.destaque-img:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+/* Overlay sutil para dar profundidade */
+.destaque-img::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+}
+
+/* ============================================
+   🎬 BADGE DE VÍDEO (botão play)
+   ============================================ */
+.badge-video-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(225, 6, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 28px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px rgba(225, 6, 0, 0.4);
+    z-index: 2;
+}
+
+.destaque-card:hover .badge-video-play,
+.card:hover .badge-video-play {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 50px rgba(225, 6, 0, 0.7);
+}
+
+/* ============================================
+   🏷️ BADGE "VÍDEO" (canto superior direito)
+   ============================================ */
+.badge-video-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff0000;
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 15px rgba(255, 0, 0, 0.4);
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   🃏 CARDS DE NOTÍCIAS (lista e grid)
+   ============================================ */
+.card-img-wrap {
+    position: relative;
+    height: 180px;
+    background-color: #0B0B0B;          /* fundo escuro */
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    overflow: hidden;
+}
+
+.card:hover .card-img-wrap {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* Overlay sutil nos cards */
+.card-img-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%);
+    pointer-events: none;
+}
+
+/* ============================================
+   🏷️ BADGE DE CATEGORIA (cards)
+   ============================================ */
+.badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.card:hover .badge {
+    background: var(--vermelho);
+    transform: translateY(-2px);
+}
+
+/* Cores específicas por categoria (mantidas) */
+.badge-policia { background: #c0392b; }
+.badge-politica { background: #2980b9; }
+.badge-cidades { background: #27ae60; }
+.badge-esportes { background: #f39c12; }
+.badge-geral { background: #7f8c8d; }
+
+/* ============================================
+   🔍 DESAPARECIDOS - FOTOS
+   ============================================ */
+.desaparecido-foto {
+    height: 180px;
+    background: #0B0B0B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform 0.4s ease;
+}
+
+.desaparecido-card:hover .desaparecido-foto {
+    transform: scale(1.03);
+}
+
+.desaparecido-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;        /* imagem inteira sem corte */
+    transition: transform 0.4s ease;
+}
+
+.desaparecido-card:hover .desaparecido-foto img {
+    transform: scale(1.05);
+}
+
+/* ============================================
+   📦 CARDS E DESTAQUE - EFEITOS DE ELEVAÇÃO
+   ============================================ */
+.destaque-card {
+    background: var(--branco);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transition: all 0.4s ease;
+}
+
+.destaque-card:hover {
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+.card {
+    background: var(--branco);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+}
+
+/* ============================================
+   🪄 PLACEHOLDER - ÍCONE QUANDO NÃO HÁ IMAGEM
+   ============================================ */
+.destaque-placeholder,
+.card-img-ph {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.15);
+    z-index: 1;
+}
+.destaque-placeholder {
+    font-size: 4rem;
+}
     </style>
 </head>
 <body>
@@ -844,7 +1098,6 @@
                 const destaqueContainer = document.getElementById('destaqueNoticia');
 
                 if (destaqueContainer) {
-                    // Verifica se tem vídeo e monta a estrutura
                     let imagemHtml = '';
 
                     if (destaque.video_url) {
@@ -865,8 +1118,9 @@
                             `;
                         }
                     } else {
+                        // A imagem agora usa background-size: contain (definido no CSS)
                         imagemHtml = `
-                            <div class="destaque-img" style="${destaque.imagem_url ? `background-image:url('${destaque.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                            <div class="destaque-img" style="${destaque.imagem_url ? `background-image:url('${destaque.imagem_url}');` : ''}">
                                 ${!destaque.imagem_url ? `<div class="destaque-placeholder"><i class="fas fa-newspaper"></i></div>` : ''}
                                 ${destaque.urgente ? '<span class="badge-urgente">🚨 URGENTE</span>' : ''}
                             </div>
@@ -896,7 +1150,7 @@
                     } else {
                         listaContainer.innerHTML = noticiasRestantes.slice(0, 5).map(not => `
                             <article class="card">
-                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}');` : ''}">
                                     ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
                                     <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
                                     ${not.video_url ? '<div class="badge-video-play"><i class="fas fa-play"></i></div>' : ''}
@@ -922,7 +1176,7 @@
                     } else {
                         gridContainer.innerHTML = gridNoticias.map(not => `
                             <article class="card">
-                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                                <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}');` : ''}">
                                     ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
                                     <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
                                     ${not.video_url ? '<div class="badge-video-play"><i class="fas fa-play"></i></div>' : ''}
