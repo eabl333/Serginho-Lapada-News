@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
 
-    <!-- Font Awesome (para todos os ícones) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <!-- Google tag (gtag.js) -->
@@ -22,7 +22,6 @@
     </script>
 
     <style>
-        /* ===== RESET & VARIÁVEIS ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --preto: #0B0B0B;
@@ -45,7 +44,6 @@
         ul, ol { list-style: none; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* ===== TOPO (com relógio e ícones SVG) ===== */
         .topo-bar {
             background: var(--preto);
             color: var(--branco);
@@ -86,7 +84,6 @@
             height: 18px;
         }
 
-        /* ===== PLANTÃO ===== */
         .plantao-bar {
             background: var(--vermelho);
             color: var(--branco);
@@ -118,7 +115,6 @@
         }
         .plantao-track:hover { animation-play-state: paused; }
 
-        /* ===== HEADER ===== */
         .site-header {
             background: var(--branco);
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -170,9 +166,7 @@
             align-items: center;
             gap: 6px;
         }
-        .main-nav a i {
-            font-size: 16px;
-        }
+        .main-nav a i { font-size: 16px; }
         .main-nav a:hover {
             background: var(--vermelho);
             color: var(--branco);
@@ -187,7 +181,6 @@
             padding: 5px 10px;
         }
 
-        /* ===== LAYOUT PRINCIPAL ===== */
         .main-layout {
             display: grid;
             grid-template-columns: 1fr 320px;
@@ -196,7 +189,6 @@
             padding-bottom: 30px;
         }
 
-        /* ===== DESTAQUE ===== */
         .destaque-section { margin-bottom: 30px; }
         .destaque-card {
             background: var(--branco);
@@ -233,6 +225,38 @@
         @keyframes pulseUrgente {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
+        }
+        .badge-video-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(225, 6, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            transition: var(--transition);
+        }
+        .destaque-card:hover .badge-video-play,
+        .card:hover .badge-video-play { transform: translate(-50%, -50%) scale(1.1); }
+        .badge-video-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff0000;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         .destaque-body { padding: 25px; }
         .cat-label {
@@ -277,7 +301,6 @@
         }
         .btn-leia:hover { background: var(--preto); transform: scale(1.02); }
 
-        /* ===== SEÇÕES ===== */
         .secao { margin-bottom: 35px; }
         .secao-header {
             display: flex;
@@ -306,7 +329,6 @@
         }
         .ver-todas:hover { opacity: 0.7; }
 
-        /* ===== CARDS DE NOTÍCIAS ===== */
         .card {
             background: var(--branco);
             border-radius: var(--radius);
@@ -373,7 +395,6 @@
         }
         .cards-grid .card { margin-bottom: 0; }
 
-        /* ===== DESAPARECIDOS ===== */
         .desaparecidos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -433,7 +454,6 @@
             margin-top: 4px;
         }
 
-        /* ===== SIDEBAR ===== */
         .widget {
             background: #fff;
             border-radius: 12px;
@@ -477,7 +497,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* ===== WHATSAPP FLUTUANTE ===== */
         .whatsapp-float {
             position: fixed;
             bottom: 25px;
@@ -499,7 +518,6 @@
             box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
         }
 
-        /* ===== FOOTER ===== */
         .site-footer {
             background: var(--preto);
             color: var(--branco);
@@ -548,7 +566,6 @@
             color: #666;
         }
 
-        /* ===== LOADING ===== */
         .loading {
             text-align: center;
             padding: 40px;
@@ -556,7 +573,6 @@
             font-size: 18px;
         }
 
-        /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 1024px) {
             .main-layout { grid-template-columns: 1fr 280px; }
         }
@@ -588,28 +604,28 @@
             .destaque-title { font-size: 1.2rem; }
         }
         .topo-links {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-.topo-links a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    color: #fff;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-    text-decoration: none;
-    font-size: 16px;
-}
-.topo-links a:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.15);
-    transform: scale(1.1);
-}
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .topo-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .topo-links a:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.15);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -619,18 +635,10 @@
        <div class="container topo-inner">
            <span id="relogio">Carregando...</span>
            <div class="topo-links">
-              <a href="#" aria-label="Facebook">
-                <i class="fab fa-facebook-f"></i>
-               </a>
-              <a href="#" aria-label="Instagram">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="#" aria-label="YouTube">
-                <i class="fab fa-youtube"></i>
-              </a>
-              <a href="https://wa.me/5565961197971" target="_blank" aria-label="WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-            </a>
+              <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+              <a href="https://wa.me/5565961197971" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
     </div>
@@ -722,18 +730,10 @@
             <div class="widget">
                 <h3 class="widget-titulo"><i class="fas fa-share-alt"></i> SIGA NAS REDES</h3>
                 <div class="widget-social">
-                    <a href="#" style="background:#1877f2;" aria-label="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" style="background:#e4405f;" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" style="background:#ff0000;" aria-label="YouTube">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                    <a href="https://wa.me/5565961197971" target="_blank" style="background:#25d366;" aria-label="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
+                    <a href="#" style="background:#1877f2;" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" style="background:#e4405f;" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="background:#ff0000;" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://wa.me/5565961197971" target="_blank" style="background:#25d366;" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
         </aside>
@@ -775,8 +775,6 @@
 
     <!-- ===== SCRIPTS ===== -->
     <script>
-
-        
         // Relógio
         function atualizarRelogio() {
             const agora = new Date();
@@ -819,6 +817,14 @@
             return data;
         }
 
+        // Função para extrair ID do YouTube
+        function extrairIDYouTube(url) {
+            if (!url) return null;
+            const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
         // === CARREGAR NOTÍCIAS ===
         async function carregarNoticias() {
             try {
@@ -833,15 +839,42 @@
                     return;
                 }
 
-                // Destaque
+                // ===== DESTAQUE =====
                 const destaque = noticias.find(n => n.destaque) || noticias[0];
                 const destaqueContainer = document.getElementById('destaqueNoticia');
+
                 if (destaqueContainer) {
+                    // Verifica se tem vídeo e monta a estrutura
+                    let imagemHtml = '';
+
+                    if (destaque.video_url) {
+                        const videoId = extrairIDYouTube(destaque.video_url);
+                        if (videoId) {
+                            imagemHtml = `
+                                <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; max-width:100%; background:#000;">
+                                    <iframe src="https://www.youtube.com/embed/${videoId}" 
+                                            style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+                                            frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            `;
+                        } else {
+                            imagemHtml = `
+                                <div class="destaque-img" style="background: #1a1a2e; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#e74c3c;"></i>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        imagemHtml = `
+                            <div class="destaque-img" style="${destaque.imagem_url ? `background-image:url('${destaque.imagem_url}'); background-size:cover; background-position:center;` : ''}">
+                                ${!destaque.imagem_url ? `<div class="destaque-placeholder"><i class="fas fa-newspaper"></i></div>` : ''}
+                                ${destaque.urgente ? '<span class="badge-urgente">🚨 URGENTE</span>' : ''}
+                            </div>
+                        `;
+                    }
+
                     destaqueContainer.innerHTML = `
-                        <div class="destaque-img" style="${destaque.imagem_url ? `background-image:url('${destaque.imagem_url}'); background-size:cover; background-position:center;` : ''}">
-                            ${!destaque.imagem_url ? `<div class="destaque-placeholder"><i class="fas fa-newspaper"></i></div>` : ''}
-                            ${destaque.urgente ? '<span class="badge-urgente">🚨 URGENTE</span>' : ''}
-                        </div>
+                        ${imagemHtml}
                         <div class="destaque-body">
                             <span class="cat-label cat-${(destaque.categoria || 'geral').toLowerCase()}">${destaque.categoria || 'Geral'}</span>
                             <h1 class="destaque-title">${destaque.titulo}</h1>
@@ -853,9 +886,10 @@
                     `;
                 }
 
-                // Lista (5 primeiras após o destaque)
+                // ===== LISTA (5 primeiras após o destaque) =====
                 const noticiasRestantes = noticias.filter(n => n.id !== destaque.id);
                 const listaContainer = document.getElementById('listaNoticias');
+
                 if (listaContainer) {
                     if (noticiasRestantes.length === 0) {
                         listaContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">📭 Mais notícias em breve</div>`;
@@ -865,6 +899,7 @@
                                 <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
                                     ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
                                     <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
+                                    ${not.video_url ? '<div class="badge-video-play"><i class="fas fa-play"></i></div>' : ''}
                                 </div>
                                 <div class="card-body">
                                     <h3 class="card-titulo"><a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''}>${not.titulo}</a></h3>
@@ -878,7 +913,7 @@
                     }
                 }
 
-                // Grid (3 notícias aleatórias da lista)
+                // ===== GRID (3 notícias) =====
                 const gridContainer = document.getElementById('gridNoticias');
                 if (gridContainer) {
                     const gridNoticias = noticias.slice(2, 5);
@@ -890,6 +925,7 @@
                                 <div class="card-img-wrap" style="${not.imagem_url ? `background-image:url('${not.imagem_url}'); background-size:cover; background-position:center;` : ''}">
                                     ${!not.imagem_url ? `<div class="card-img-ph"><i class="fas fa-newspaper"></i></div>` : ''}
                                     <span class="badge badge-${(not.categoria || 'geral').toLowerCase()}">${not.categoria || 'Geral'}</span>
+                                    ${not.video_url ? '<div class="badge-video-play"><i class="fas fa-play"></i></div>' : ''}
                                 </div>
                                 <div class="card-body">
                                     <h3 class="card-titulo"><a href="${not.link_externo || 'noticia.html?id=' + not.id}" ${not.link_externo ? 'target="_blank"' : ''}>${not.titulo}</a></h3>
@@ -902,6 +938,7 @@
                         `).join('');
                     }
                 }
+
             } catch (error) {
                 console.error('Erro:', error);
                 document.getElementById('listaNoticias').innerHTML = `
@@ -949,6 +986,7 @@
         // === EXECUÇÃO DIRETA ===
         carregarNoticias();
         carregarDesaparecidos();
+
     </script>
 </body>
 </html>

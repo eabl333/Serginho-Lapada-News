@@ -115,6 +115,64 @@
         .form-group textarea:focus,
         .form-group select:focus { border-color: var(--vermelho); outline: none; }
         .form-group textarea { min-height: 80px; resize: vertical; }
+
+        /* ---- ESTILOS PARA UPLOAD DE IMAGEM ---- */
+        .file-upload-label {
+            display: inline-block;
+            background: var(--vermelho);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-upload-label:hover { background: var(--preto); }
+        .form-file { display: none; }
+        .file-name {
+            margin-left: 10px;
+            font-size: 14px;
+            color: var(--cinza-escuro);
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            min-height: 80px;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            display: block;
+        }
+        .image-preview .placeholder-text {
+            color: #aaa;
+            font-size: 14px;
+            padding: 20px;
+        }
+        .form-help {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+        /* ---- PREVIEW DO VÍDEO ---- */
+        #video-preview {
+            margin-top: 8px;
+            display: none;
+        }
+        #video-preview img {
+            max-height: 80px;
+            border-radius: 4px;
+        }
+
         .btn-primary {
             background: var(--vermelho);
             color: var(--branco);
@@ -251,6 +309,7 @@
             <div id="avisoGlobal"></div>
 
             <div id="conteudoAdmin">
+                <!-- ===== DASHBOARD ===== -->
                 <div id="pagina-dashboard" class="pagina-admin ativa">
                     <div class="dashboard-grid" id="dashboardCards">
                         <div class="dash-card">
@@ -272,6 +331,7 @@
                     </div>
                 </div>
 
+                <!-- ===== NOTÍCIAS ===== -->
                 <div id="pagina-noticias" class="pagina-admin">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                         <h2>Gerenciar Notícias</h2>
@@ -282,6 +342,7 @@
                         <h3 id="formNoticiaTitulo">Nova Notícia</h3>
                         <form id="formNoticia" onsubmit="salvarNoticia(event)">
                             <input type="hidden" id="noticiaId">
+
                             <div class="form-group">
                                 <label>Título *</label>
                                 <input type="text" id="notTitulo" required placeholder="Título da notícia">
@@ -302,10 +363,42 @@
                                 <label>Resumo *</label>
                                 <textarea id="notResumo" required placeholder="Resumo da notícia"></textarea>
                             </div>
+
+                            <!-- ===== UPLOAD DE IMAGEM ===== -->
                             <div class="form-group">
-                                <label>Link da Imagem (URL)</label>
-                                <input type="text" id="notImagem" placeholder="https://exemplo.com/foto.jpg">
+                                <label class="form-label">Imagem da notícia</label>
+                                <label for="notImagemFile" class="file-upload-label">
+                                    Escolher imagem
+                                </label>
+                                <input
+                                    type="file"
+                                    id="notImagemFile"
+                                    name="image"
+                                    class="form-input form-file"
+                                    accept="image/jpeg, image/png, image/webp"
+                                    onchange="previewImagem(event)"
+                                />
+                                <span id="file-name" class="file-name">Nenhum arquivo selecionado</span>
+                                <div id="image-preview" class="image-preview" aria-live="polite">
+                                    <span class="placeholder-text">Nenhuma imagem selecionada</span>
+                                </div>
+                                <p class="form-help">Formatos aceitos: JPG, JPEG, PNG, WEBP</p>
                             </div>
+
+                            <!-- ===== URL DA IMAGEM (preenchida automaticamente pelo upload) ===== -->
+                            <div class="form-group">
+                                <label>Link da Imagem (URL) – preenchido automaticamente</label>
+                                <input type="text" id="notImagem" placeholder="URL da imagem (será preenchida após upload)">
+                            </div>
+
+                            <!-- ===== VÍDEO DO YOUTUBE COM PREVIEW DA CAPA ===== -->
+                            <div class="form-group">
+                                <label>URL do YouTube</label>
+                                <input type="text" id="notVideo" placeholder="https://www.youtube.com/watch?v=..." oninput="previewYouTubeCapa()">
+                                <small style="color:#999;">Se preenchido, o vídeo será exibido na notícia.</small>
+                                <div id="video-preview"></div>
+                            </div>
+
                             <div class="form-group">
                                 <label>Link Externo (opcional)</label>
                                 <input type="text" id="notLink" placeholder="https://... (deixe vazio para usar a página interna)">
@@ -332,6 +425,7 @@
                     <div id="listaNoticiasAdmin"><div class="loading">Carregando notícias...</div></div>
                 </div>
 
+                <!-- ===== DESAPARECIDOS ===== -->
                 <div id="pagina-desaparecidos" class="pagina-admin">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                         <h2>Gerenciar Desaparecidos</h2>
@@ -393,6 +487,7 @@
             avisoGlobal.textContent = texto;
         }
 
+        // ===== AUTENTICAÇÃO =====
         async function verificarAdmin() {
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -412,6 +507,7 @@
             }
         }
 
+        // ===== NAVEGAÇÃO =====
         document.querySelectorAll('.admin-nav a').forEach(link => {
             link.addEventListener('click', function() {
                 document.querySelectorAll('.admin-nav a').forEach(l => l.classList.remove('active'));
@@ -430,6 +526,7 @@
             });
         });
 
+        // ===== DASHBOARD =====
         async function carregarDashboard() {
             try {
                 const { data: noticias, error: erroNoticias } = await supabaseClient.from('noticias').select('*');
@@ -461,9 +558,104 @@
             }
         }
 
+        // ===== UPLOAD DE IMAGEM =====
+        function previewImagem(event) {
+            const file = event.target.files[0];
+            const fileNameSpan = document.getElementById('file-name');
+            const previewDiv = document.getElementById('image-preview');
+
+            if (!file) {
+                fileNameSpan.textContent = 'Nenhum arquivo selecionado';
+                previewDiv.innerHTML = '<span class="placeholder-text">Nenhuma imagem selecionada</span>';
+                return;
+            }
+
+            fileNameSpan.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview da imagem">`;
+            };
+            reader.readAsDataURL(file);
+
+            uploadImagem(file);
+        }
+
+        async function uploadImagem(file) {
+            try {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
+                const filePath = `noticias/${fileName}`;
+
+                const { data, error } = await supabaseClient.storage
+                    .from('noticias')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false,
+                        contentType: file.type
+                    });
+
+                if (error) throw error;
+
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('noticias')
+                    .getPublicUrl(filePath);
+
+                document.getElementById('notImagem').value = publicUrl;
+                document.getElementById('notImagem').style.borderColor = '#27ae60';
+
+            } catch (error) {
+                console.error('Erro no upload:', error);
+                alert('Erro ao fazer upload da imagem: ' + error.message);
+            }
+        }
+
+        // ===== PREVIEW DO YOUTUBE =====
+        function previewYouTubeCapa() {
+            const url = document.getElementById('notVideo').value.trim();
+            const previewDiv = document.getElementById('video-preview');
+
+            if (!url) {
+                previewDiv.innerHTML = '';
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            const videoId = extrairIDYouTube(url);
+            if (videoId) {
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                previewDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+                        <img src="${thumbnailUrl}" alt="Thumbnail do YouTube" style="max-height:80px; border-radius:4px;">
+                        <span style="font-size:14px; color:#666;">Capa do vídeo carregada</span>
+                    </div>
+                `;
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.innerHTML = '<span style="color:#e74c3c; font-size:13px;">URL do YouTube inválida</span>';
+                previewDiv.style.display = 'block';
+            }
+        }
+
+        function extrairIDYouTube(url) {
+            if (!url) return null;
+            const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+        // ===== NOTÍCIAS – ABRIR FORMULÁRIO =====
         function abrirFormNoticia(dados = null) {
             const container = document.getElementById('formNoticiaContainer');
             container.style.display = 'block';
+
+            // Reset do preview e nome do arquivo
+            document.getElementById('file-name').textContent = 'Nenhum arquivo selecionado';
+            document.getElementById('image-preview').innerHTML = '<span class="placeholder-text">Nenhuma imagem selecionada</span>';
+            document.getElementById('notImagem').style.borderColor = '#ddd';
+            document.getElementById('video-preview').innerHTML = '';
+            document.getElementById('video-preview').style.display = 'none';
+
             if (dados) {
                 document.getElementById('formNoticiaTitulo').textContent = 'Editar Notícia';
                 document.getElementById('noticiaId').value = dados.id;
@@ -471,15 +663,30 @@
                 document.getElementById('notCategoria').value = dados.categoria || 'Geral';
                 document.getElementById('notResumo').value = dados.resumo || '';
                 document.getElementById('notImagem').value = dados.imagem_url || '';
+                document.getElementById('notVideo').value = dados.video_url || '';
                 document.getElementById('notLink').value = dados.link_externo || '';
                 document.getElementById('notAutor').value = dados.autor || '';
                 document.getElementById('notTempo').value = dados.Tempo || '';
                 document.getElementById('notDestaque').checked = dados.destaque || false;
                 document.getElementById('notUrgente').checked = dados.urgente || false;
+
+                // Se houver imagem, mostrar preview
+                if (dados.imagem_url) {
+                    const previewDiv = document.getElementById('image-preview');
+                    previewDiv.innerHTML = `<img src="${dados.imagem_url}" alt="Imagem atual">`;
+                    document.getElementById('file-name').textContent = 'Imagem atual (clique em "Escolher imagem" para trocar)';
+                }
+
+                // Se houver vídeo, mostrar preview da capa
+                if (dados.video_url) {
+                    previewYouTubeCapa();
+                }
             } else {
                 document.getElementById('formNoticiaTitulo').textContent = 'Nova Notícia';
                 document.getElementById('formNoticia').reset();
                 document.getElementById('noticiaId').value = '';
+                document.getElementById('notVideo').value = '';
+                document.getElementById('notImagem').value = '';
             }
         }
 
@@ -487,13 +694,19 @@
             document.getElementById('formNoticiaContainer').style.display = 'none';
         }
 
+        // ===== SALVAR NOTÍCIA =====
         async function salvarNoticia(e) {
             e.preventDefault();
+
+            const imagem_url = document.getElementById('notImagem').value.trim() || null;
+            const video_url = document.getElementById('notVideo').value.trim() || null;
+
             const dados = {
                 titulo: document.getElementById('notTitulo').value.trim(),
                 categoria: document.getElementById('notCategoria').value,
                 resumo: document.getElementById('notResumo').value.trim(),
-                imagem_url: document.getElementById('notImagem').value.trim() || null,
+                imagem_url: imagem_url,
+                video_url: video_url,
                 link_externo: document.getElementById('notLink').value.trim() || null,
                 autor: document.getElementById('notAutor').value.trim() || 'Serginho Lapada',
                 Tempo: document.getElementById('notTempo').value.trim() || 'agora',
@@ -501,6 +714,7 @@
                 urgente: document.getElementById('notUrgente').checked,
                 status: 'publicado'
             };
+
             try {
                 const id = document.getElementById('noticiaId').value;
                 let resultado;
@@ -522,6 +736,7 @@
             }
         }
 
+        // ===== LISTAR NOTÍCIAS =====
         async function carregarNoticiasAdmin() {
             const container = document.getElementById('listaNoticiasAdmin');
             container.innerHTML = '<div class="loading">Carregando...</div>';
@@ -542,6 +757,7 @@
                             <p>${not.resumo}</p>
                             <small>${not.categoria || 'Geral'} • ${new Date(not.created_at).toLocaleDateString('pt-BR')}</small>
                             ${not.destaque ? ' <span class="badge-destaque">Destaque</span>' : ''}
+                            ${not.video_url ? ' <span style="background:#ff0000; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700;">VÍDEO</span>' : ''}
                         </div>
                         <div class="acoes">
                             <button onclick='abrirFormNoticia(${JSON.stringify(not)})' class="btn-editar">Editar</button>
@@ -562,6 +778,7 @@
             carregarDashboard();
         }
 
+        // ===== DESAPARECIDOS =====
         function abrirFormDesaparecido(dados = null) {
             const container = document.getElementById('formDesaparecidoContainer');
             container.style.display = 'block';

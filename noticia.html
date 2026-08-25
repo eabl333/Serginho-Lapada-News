@@ -27,6 +27,23 @@
             align-items: center;
             justify-content: center;
             font-size: 5rem;
+            background-size: cover;
+            background-position: center;
+        }
+        .noticia-video-wrap {
+            position: relative;
+            width: 100%;
+            /* proporção 16:9 */
+            padding-top: 56.25%;
+            background: #000;
+        }
+        .noticia-video-wrap iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
         .noticia-corpo { padding: 30px; }
         .noticia-completa h1 { font-size: 2.5rem; margin: 15px 0; }
@@ -91,6 +108,23 @@
     </div>
 
     <script>
+        // Converte qualquer formato de link do YouTube (watch, youtu.be, shorts, embed)
+        // para a URL de embed usada no iframe. Retorna null se não for um link válido do YouTube.
+        function getYoutubeEmbedUrl(url) {
+            if (!url) return null;
+            const padroes = [
+                /youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
+                /youtu\.be\/([a-zA-Z0-9_-]+)/,
+                /youtube\.com\/embed\/([a-zA-Z0-9_-]+)/,
+                /youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/
+            ];
+            for (const padrao of padroes) {
+                const m = url.match(padrao);
+                if (m && m[1]) return `https://www.youtube.com/embed/${m[1]}`;
+            }
+            return null;
+        }
+
         async function carregarNoticia() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
@@ -105,10 +139,24 @@
                     document.getElementById('conteudoNoticia').innerHTML = '<div style="color:red; padding:30px;">❌ Notícia não encontrada</div>';
                     return;
                 }
+
+                const embedUrl = getYoutubeEmbedUrl(data.video_url);
+
+                // Bloco de mídia: se tiver vídeo do YouTube, mostra o player.
+                // Caso contrário, mostra a imagem (se houver).
+                let blocoMidia = '';
+                if (embedUrl) {
+                    blocoMidia = `
+                        <div class="noticia-video-wrap">
+                            <iframe src="${embedUrl}" title="${data.titulo}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    `;
+                } else if (data.imagem_url) {
+                    blocoMidia = `<div class="noticia-img" style="background-image:url('${data.imagem_url}');"></div>`;
+                }
+
                 document.getElementById('conteudoNoticia').innerHTML = `
-                    <div class="noticia-img" style="${data.imagem_url ? `background-image:url('${data.imagem_url}'); background-size:cover; background-position:center;` : ''}">
-                        ${!data.imagem_url ? '' : ''}
-                    </div>
+                    ${blocoMidia}
                     <div class="noticia-corpo">
                         <span class="cat-label cat-${(data.categoria || 'geral').toLowerCase()}">${data.categoria || 'Geral'}</span>
                         <h1>${data.titulo}</h1>
