@@ -2,7 +2,7 @@
 // 🔑 CONFIGURAÇÃO DO SUPABASE
 // ============================================
 
-const SUPABASE_URL = 'https://uhnmkwwdmqepdbaiubmw.supabase.co';
+const SUPABASE_URL = 'https://wqhfiheqkbfhnpxswcdc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6HrPV0LuCScuvmkSRuAslg_nhBzgkhZ';
 
 // Criar cliente Supabase
